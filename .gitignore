@@ -1,0 +1,27 @@
+# Build artifacts and compiled executables
+/bin/
+/dist/
+codemri
+codemri.exe
+*.o
+*.a
+*.so
+
+# CodeMRI generated database and cache
+.codemri/
+*.graph.db
+*.db-journal
+
+# IDEs and local configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Go specific
+vendor/
+go.work
+go.work.sum
+env.local
+.env
