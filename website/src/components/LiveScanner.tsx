@@ -37,8 +37,8 @@ export const LiveScanner: React.FC = () => {
     setScanning(true);
     setScanComplete(false);
     setLogs([
-      `⚡ [CodeMRI Online] Connecting to public mirror for: ${target}`,
-      '📡 Executing simulated fast scanner (v0.1.0 Genesis)...'
+      '💓 Executing Pulse architectural intelligence scan (v0.4.0)...',
+      '📂 Initializing universal AST syntax classification parser...'
     ]);
 
     setTimeout(() => {

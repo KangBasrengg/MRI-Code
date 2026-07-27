@@ -68,9 +68,9 @@ export const DOCS_DATA: DocSection[] = [
       {
         type: 'list',
         items: [
-          'CodeMRI_0.2.0_windows_amd64.zip',
-          'CodeMRI_0.2.0_linux_amd64.tar.gz',
-          'CodeMRI_0.2.0_darwin_arm64.tar.gz'
+          'codemri_v0.4.0_windows_amd64.zip',
+          'codemri_v0.4.0_linux_amd64.tar.gz',
+          'codemri_v0.4.0_darwin_arm64.tar.gz'
         ]
       },
       {
@@ -81,7 +81,7 @@ export const DOCS_DATA: DocSection[] = [
       {
         type: 'code',
         language: 'bash',
-        code: '# Confirm the binary is accessible\ncodemri version\n\n# Expected output:\n# CodeMRI v0.3.0 ("Neuron")\n# 🎯 Core Engine : Neural Repository Graph (NRG) - SQLite Relational Engine\n# 🚀 Go Runtime  : go1.26.5 (windows/amd64)\n# 💎 Philosophy  : We don\'t generate code. We generate understanding.'
+        code: '# Confirm the binary is accessible\ncodemri version\n\n# Expected output:\n# CodeMRI v0.4.0 ("Pulse")\n# 🎯 Core Engine : Neural Repository Graph (NRG) - SQLite Relational & Pulse Analytical Engine\n# 🚀 Go Runtime  : go1.26.5 (windows/amd64)\n# 💎 Philosophy  : We don\'t generate code. We generate understanding.'
       }
     ]
   },

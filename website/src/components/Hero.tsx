@@ -25,11 +25,11 @@ export const Hero: React.FC<HeroProps> = ({ onInstallClick, onOpenHallOfFame }) 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Release Badge */}
-        <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-black/60 border border-cyan-500/40 text-xs text-cyan-300 font-mono font-extrabold mb-8 shadow-xl hover:border-cyan-400 transition-all cursor-pointer backdrop-blur-md" onClick={onOpenHallOfFame}>
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <span>v0.3.0 Neuron Released — SQLite Relational Graph Engine Online ⚡</span>
-          <ArrowRight className="w-3.5 h-3.5 text-cyan-300" />
-        </div>
+        <button onClick={onOpenHallOfFame} className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-black/60 border border-cyan-500/40 text-xs text-cyan-300 font-mono font-extrabold mb-8 shadow-xl hover:border-cyan-400 transition-all cursor-pointer backdrop-blur-md group">
+          <span className="w-2 h-2 rounded-full bg-pink-400 animate-ping mr-2" />
+          <span>v0.4.0 Pulse Released — Architectural Debt & Health Engine Online 💓</span>
+          <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+        </button>
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-none mb-6">

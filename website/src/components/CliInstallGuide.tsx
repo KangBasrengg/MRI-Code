@@ -34,7 +34,7 @@ codemri`,
     linux: `# Step 1: Install globally via secure shell installer
 curl -fsSL https://codemri.dev/install.sh | sh
 
-# OR download standalone binary (CodeMRI_0.1.0_linux_amd64.tar.gz) from GitHub
+# OR download standalone binary (codemri_v0.4.0_linux_amd64.tar.gz) from GitHub Releases
 cd ~/workspace/backend-service
 codemri`,
     go: `# For Go developers (Runtime v1.21+)

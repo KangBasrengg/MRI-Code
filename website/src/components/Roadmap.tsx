@@ -15,29 +15,38 @@ export const Roadmap: React.FC = () => {
     {
       ver: "v0.2.0",
       code: "Atlas",
-      title: "High-Speed Scanner & Tree-sitter Parsers",
-      status: "NEXT MILESTONE",
-      items: ["Multi-language AST pipelines (Go, TS, Python, SQL)", "High-speed concurrent filesystem walking", "Automatic language detection & metrics", "Local caching engine"],
-      icon: <Cpu className="w-6 h-6 text-cyan-400" />,
-      badgeColor: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+      title: "High-Speed Scanner & Universal AST Parser",
+      status: "COMPLETED",
+      items: ["Multi-language AST pipelines (Go, TS, Python, SQL, Java, etc.)", "High-speed concurrent worker pool scanning", "Automatic language detection & metrics", "Local caching engine"],
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-400" />,
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
     },
     {
       ver: "v0.3.0",
       code: "Neuron",
-      title: "Neural Repository Graph (NRG) Indexing",
-      status: "PLANNED",
-      items: ["SQLite embedded database engine (.codemri/graph.db)", "Dependency & call graph resolution", "Import & export mapping", "Zero raw source rescanning"],
-      icon: <Zap className="w-6 h-6 text-purple-400" />,
-      badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/40"
+      title: "Embedded SQLite Relational Engine",
+      status: "COMPLETED",
+      items: ["Pure-Go SQLite relational graph engine (.codemri/graph.db)", "Sub-millisecond dependency & call graph resolution", "Reactive dark-mode embedded Web UI on port 4000", "Zero CGO & zero external dependencies"],
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-400" />,
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
     },
     {
-      ver: "v0.4.0 — v0.5.0",
-      code: "Pulse & Vision",
-      title: "Health Analytics & Interactive Dashboard",
-      status: "PLANNED",
-      items: ["Circular dependency detection", "Technical Debt & Complexity health scorecards", "Next.js + React Flow interactive browser UI", "Instant zoom & search filtering"],
-      icon: <ShieldCheck className="w-6 h-6 text-blue-400" />,
-      badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/40"
+      ver: "v0.4.0",
+      code: "Pulse",
+      title: "Architectural Technical Debt & Health Engine",
+      status: "COMPLETED",
+      items: ["Authoritative 0-100 repository health scores (A+ to F grades)", "Dead code & zero-incoming call symbol discovery", "Circular dependency import cycle detection via DFS", "Actionable AI architectural recommendations"],
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-400" />,
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+    },
+    {
+      ver: "v0.5.0",
+      code: "Vision",
+      title: "Interactive Force-Directed 2D/3D Topology Canvas",
+      status: "IN PROGRESS",
+      items: ["Force-directed visual node rendering in browser", "Interactive drill-down on circular loops and complexity hotpots", "Real-time module filtering & sub-graph isolation", "Dynamic smooth zoom & search filtering"],
+      icon: <Cpu className="w-6 h-6 text-cyan-400 animate-pulse" />,
+      badgeColor: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
     },
     {
       ver: "v1.0.0+",

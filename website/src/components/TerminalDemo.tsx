@@ -113,7 +113,7 @@ export const TerminalDemo: React.FC = () => {
               <span className={`w-2 h-2 rounded-full ${step === 4 ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`} />
               <span>{step === 4 ? 'NRG Compiled Successfully' : 'Executing Fast AST Walk...'}</span>
             </span>
-            <span className="text-slate-500">v0.1.0 Genesis Engine</span>
+            <span className="text-slate-500">v0.4.0 Pulse Engine</span>
           </div>
         </div>
 
