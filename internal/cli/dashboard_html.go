@@ -826,7 +826,7 @@ const dashboardHTML = `<!DOCTYPE html>
             const container = document.getElementById('impact-content');
             container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">🔄 Calculating real-time impact radius via SQLite NRG...</div>';
             try {
-                const res = await fetch('/api/graph/impact/' + encodeURIComponent(nodeId));
+                const res = await fetch('/api/graph/impact?id=' + encodeURIComponent(nodeId));
                 if (!res.ok) {
                     container.innerHTML = '<div style="color: #ef4444;">Failed to calculate impact.</div>';
                     return;

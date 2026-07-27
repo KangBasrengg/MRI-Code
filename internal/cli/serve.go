@@ -216,7 +216,7 @@ var serveCmd = &cobra.Command{
 		})
 
 		// ─── API: Phase 05 ("Vision") Instant Impact Analysis & Subgraph Topology ───
-		app.Get("/api/graph/impact/:id", func(c *fiber.Ctx) error {
+		handleImpact := func(c *fiber.Ctx) error {
 			cwd, dbPath := getDotFile("graph.db")
 			_, graphPath := getDotFile("graph.json")
 			var nrg *graph.NeuralRepositoryGraph
@@ -233,7 +233,7 @@ var serveCmd = &cobra.Command{
 				json.Unmarshal(data, nrg)
 			}
 
-			targetID := c.Params("id")
+			targetID := c.Query("id", c.Params("id"))
 			targetNode, exists := nrg.Nodes[targetID]
 			if !exists {
 				return c.Status(404).JSON(fiber.Map{"error": "node not found in Neural Repository Graph"})
@@ -273,7 +273,9 @@ var serveCmd = &cobra.Command{
 				"severity":                severity,
 				"advice":                  fmt.Sprintf("Modifying %s risks cascading changes across %d dependent symbol layers.", targetNode.Name, len(upstreamDependents)),
 			})
-		})
+		}
+		app.Get("/api/graph/impact", handleImpact)
+		app.Get("/api/graph/impact/:id", handleImpact)
 
 		// ─── API: Cortex & Freemodel.dev AI Interactive Chatbot ───
 		app.Post("/api/chat", func(c *fiber.Ctx) error {
