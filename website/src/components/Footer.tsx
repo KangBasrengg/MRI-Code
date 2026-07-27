@@ -11,9 +11,9 @@ export const Footer: React.FC = () => {
           
           {/* Col 1: Brand */}
           <div className="md:col-span-2 space-y-3">
-            <div className="flex items-center space-x-2 text-white font-sans font-black text-lg">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500/20 via-blue-600/30 to-purple-600/30 border border-cyan-500/40 flex items-center justify-center p-1">
-                <img src={codemriLogo} alt="CodeMRI Logo" className="w-full h-full object-contain filter drop-shadow" />
+            <div className="flex items-center space-x-2.5 text-white font-sans font-black text-lg">
+              <div className="w-8 h-8 rounded-lg overflow-hidden border border-cyan-500/50 shadow-md flex items-center justify-center bg-black">
+                <img src={codemriLogo} alt="CodeMRI Logo" className="w-full h-full object-cover" />
               </div>
               <span>Code-MRI Platform</span>
             </div>

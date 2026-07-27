@@ -6,6 +6,7 @@
 *"GitHub shows your syntax and file lists. CodeMRI reveals how your software actually thinks and executes."*
 
 [![Version](https://img.shields.io/badge/Release-v1.0.0__MRI-10B981?style=for-the-badge&logo=go&logoColor=white&labelColor=080b12)](https://github.com/KangBasrengg/MRI-Code/releases)
+[![Live Web Docs](https://img.shields.io/badge/Documentation-Get__Started__Web-00F2FF?style=for-the-badge&logo=vercel&logoColor=black&labelColor=080b12)](https://codemri.vercel.app/)
 [![Engine: Full Spectrum](https://img.shields.io/badge/Engine-Full__Spectrum__Intelligence-6366F1?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/release_notes/v1.0.0-mri.md)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25__Offline__CPU-3B82F6?style=for-the-badge&logo=security&logoColor=white&labelColor=080b12)](docs/philosophy.md)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F59E0B.svg?style=for-the-badge&labelColor=080b12)](https://opensource.org/licenses/Apache-2.0)
@@ -13,6 +14,10 @@
 
 
 <br>
+
+> [!IMPORTANT]  
+> 🌐 **Live Interactive Web Documentation & Get Started Guide:**  
+> Looking for step-by-step usage tutorials, interactive architecture demos, and practical CLI command examples? Visit our official serverless Web Guide at **[codemri.vercel.app](https://codemri.vercel.app/)**!
 
 <p align="center">
   <b>Don't clone our tool. Just install once, navigate into any complex repository, and type one word:</b><br>
