@@ -179,6 +179,64 @@ var serveCmd = &cobra.Command{
 			return c.JSON(neighbors)
 		})
 
+		// ─── API: Phase 05 ("Vision") Instant Impact Analysis & Subgraph Topology ───
+		app.Get("/api/graph/impact/:id", func(c *fiber.Ctx) error {
+			var nrg *graph.NeuralRepositoryGraph
+			if sqliteStore, err := graph.NewSQLiteStorage(dbPath); err == nil {
+				nrg, _ = sqliteStore.LoadGraph(cwd)
+				sqliteStore.Close()
+			}
+			if nrg == nil {
+				data, err := os.ReadFile(graphPath)
+				if err != nil {
+					return c.Status(404).JSON(fiber.Map{"error": "graph not available for impact analysis"})
+				}
+				nrg = &graph.NeuralRepositoryGraph{}
+				json.Unmarshal(data, nrg)
+			}
+
+			targetID := c.Params("id")
+			targetNode, exists := nrg.Nodes[targetID]
+			if !exists {
+				return c.Status(404).JSON(fiber.Map{"error": "node not found in Neural Repository Graph"})
+			}
+
+			upstreamDependents := make([]*graph.Node, 0)
+			downstreamDependencies := make([]*graph.Node, 0)
+
+			for _, edge := range nrg.Edges {
+				if edge.TargetID == targetID {
+					if uNode, ok := nrg.Nodes[edge.SourceID]; ok {
+						upstreamDependents = append(upstreamDependents, uNode)
+					}
+				} else if edge.SourceID == targetID {
+					if dNode, ok := nrg.Nodes[edge.TargetID]; ok {
+						downstreamDependencies = append(downstreamDependencies, dNode)
+					}
+				}
+			}
+
+			impactScore := (len(upstreamDependents)*3 + len(downstreamDependencies)) * 10
+			if impactScore > 100 {
+				impactScore = 100
+			}
+			severity := "Low Impact"
+			if impactScore >= 70 {
+				severity = "Critical Architectural Bottleneck"
+			} else if impactScore >= 40 {
+				severity = "Moderate Ripple Effect"
+			}
+
+			return c.JSON(fiber.Map{
+				"target_node":             targetNode,
+				"upstream_dependents":     upstreamDependents,
+				"downstream_dependencies": downstreamDependencies,
+				"impact_score":            impactScore,
+				"severity":                severity,
+				"advice":                  fmt.Sprintf("Modifying %s risks cascading changes across %d dependent symbol layers.", targetNode.Name, len(upstreamDependents)),
+			})
+		})
+
 		// ─── Dashboard: Rich Interactive HTML ───
 		app.Get("/", func(c *fiber.Ctx) error {
 			c.Set("Content-Type", "text/html; charset=utf-8")

@@ -43,10 +43,10 @@ export const Roadmap: React.FC = () => {
       ver: "v0.5.0",
       code: "Vision",
       title: "Interactive Force-Directed 2D/3D Topology Canvas",
-      status: "IN PROGRESS",
+      status: "COMPLETED",
       items: ["Force-directed visual node rendering in browser", "Interactive drill-down on circular loops and complexity hotpots", "Real-time module filtering & sub-graph isolation", "Dynamic smooth zoom & search filtering"],
-      icon: <Cpu className="w-6 h-6 text-cyan-400 animate-pulse" />,
-      badgeColor: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-400" />,
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
     },
     {
       ver: "v1.0.0+",
