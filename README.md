@@ -108,7 +108,7 @@ We believe in absolute transparency and building developer understanding over mi
 - **[📜 The CodeMRI Product Philosophy & Adoption Manifesto](docs/philosophy.md)**
 - **[📐 ADR-0001: Neural Repository Graph (NRG) as Single Source of Truth](docs/ADR/0001-neural-repository-graph.md)**
 - **[🛡️ ADR-0002: Local Privacy — Zero Cloud Transmission Policy](docs/ADR/0002-local-privacy.md)**
-- **[🌐 Official Web Landing Page & Documentation Portal](website/)**
+- **[🌐 Official Web Landing Page & Documentation Portal](https://codemri.vercel.app/)**
 
 ---
 
