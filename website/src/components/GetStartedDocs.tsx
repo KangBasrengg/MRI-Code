@@ -1,9 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Copy, Check, Cpu, ArrowRight, Sparkles } from 'lucide-react';
 
 export const GetStartedDocs = () => {
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [installTab, setInstallTab] = useState<'go' | 'windows' | 'linux' | 'macos'>('go');
+  const [activeId, setActiveId] = useState<string>('introduction');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sectionIds = [
+        'introduction', 'installation', 'why-codemri',
+        'pulse', 'shield', 'velocity', 'vision', 'cortex',
+        'architecture', 'sqlite-engine', 'offline-first',
+        'usage-local', 'usage-online', 'usage-ai', 'usage-cli'
+      ];
+      
+      const scrollPosition = window.scrollY + 250;
+
+      for (const id of sectionIds) {
+        const element = document.getElementById(id);
+        if (element) {
+          const top = element.offsetTop;
+          const height = element.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveId(id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -18,58 +48,92 @@ export const GetStartedDocs = () => {
     macos: 'curl -fsSL https://raw.githubusercontent.com/KangBasrengg/MRI-Code/main/install-mac.sh | bash',
   };
 
+  const renderNavLinks = (items: { id: string; label: string }[]) => {
+    return (
+      <ul className="space-y-1.5 font-medium">
+        {items.map((item) => {
+          const isActive = activeId === item.id;
+          return (
+            <li key={item.id}>
+              <a
+                href={`#${item.id}`}
+                onClick={() => setActiveId(item.id)}
+                className={`group flex items-center justify-between px-3.5 py-2 rounded-xl text-xs transition-all duration-200 border ${
+                  isActive
+                    ? `bg-gradient-to-r from-cyan-500/25 via-blue-600/20 to-transparent border-cyan-500/60 text-cyan-300 font-black shadow-lg shadow-cyan-500/20 translate-x-2 scale-[1.02]`
+                    : `border-transparent text-slate-400 hover:bg-slate-800/90 hover:border-slate-700/80 hover:text-white hover:translate-x-1.5 hover:shadow-md hover:shadow-black/40`
+                }`}
+              >
+                <span className="truncate pr-1">{item.label}</span>
+                {isActive ? (
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400 animate-pulse ml-2 flex-shrink-0" />
+                ) : (
+                  <span className="opacity-0 group-hover:opacity-100 transition-all text-slate-500 group-hover:text-cyan-400 font-mono text-[10px] ml-2 font-bold">→</span>
+                )}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-10">
       
-      {/* 1. Left Sidebar: Tailwind/React.dev Style Docs Navigation */}
+      {/* 1. Left Sidebar: Tailwind/React.dev Style Docs Navigation with Popup Hover */}
       <aside className="w-full md:w-64 flex-shrink-0">
-        <div className="sticky top-24 space-y-8 pr-4 max-h-[calc(100vh-8rem)] overflow-y-auto font-sans text-sm pb-10 border-r border-slate-800/80">
+        <div className="sticky top-24 space-y-7 pr-4 max-h-[calc(100vh-6.5rem)] overflow-y-auto font-sans text-sm pb-10 border-r border-slate-800/80 custom-scrollbar">
           
           <div>
-            <h5 className="font-mono text-xs font-bold uppercase tracking-wider text-cyan-400 mb-3">
+            <h5 className="font-mono text-[11px] font-bold uppercase tracking-wider text-cyan-400 mb-2.5 px-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
               Getting Started
             </h5>
-            <ul className="space-y-2 text-slate-400 font-medium">
-              <li><a href="#introduction" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-cyan-400 pl-3 -ml-[2px]">What is CodeMRI?</a></li>
-              <li><a href="#installation" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-cyan-400 pl-3 -ml-[2px]">Quick Installation</a></li>
-              <li><a href="#why-codemri" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-cyan-400 pl-3 -ml-[2px]">Why CodeMRI vs Others</a></li>
-            </ul>
+            {renderNavLinks([
+              { id: 'introduction', label: 'What is CodeMRI?' },
+              { id: 'installation', label: 'Quick Installation' },
+              { id: 'why-codemri', label: 'Why CodeMRI vs Others' }
+            ])}
           </div>
 
           <div>
-            <h5 className="font-mono text-xs font-bold uppercase tracking-wider text-blue-400 mb-3">
+            <h5 className="font-mono text-[11px] font-bold uppercase tracking-wider text-blue-400 mb-2.5 px-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
               Core Functions
             </h5>
-            <ul className="space-y-2 text-slate-400 font-medium">
-              <li><a href="#pulse" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-blue-400 pl-3 -ml-[2px]">💓 Pulse (Health Scoring)</a></li>
-              <li><a href="#shield" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-blue-400 pl-3 -ml-[2px]">🛡️ Shield (Security Audit)</a></li>
-              <li><a href="#velocity" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-blue-400 pl-3 -ml-[2px]">🚀 Velocity (Performance)</a></li>
-              <li><a href="#vision" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-blue-400 pl-3 -ml-[2px]">👁️ Vision (Impact Radius)</a></li>
-              <li><a href="#cortex" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-blue-400 pl-3 -ml-[2px]">🤖 Cortex AI Copilot</a></li>
-            </ul>
+            {renderNavLinks([
+              { id: 'pulse', label: '💓 Pulse (Health Scoring)' },
+              { id: 'shield', label: '🛡️ Shield (Security Audit)' },
+              { id: 'velocity', label: '🚀 Velocity (Performance)' },
+              { id: 'vision', label: '👁️ Vision (Impact Radius)' },
+              { id: 'cortex', label: '🤖 Cortex AI Copilot' }
+            ])}
           </div>
 
           <div>
-            <h5 className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400 mb-3">
+            <h5 className="font-mono text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-2.5 px-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               How It Works
             </h5>
-            <ul className="space-y-2 text-slate-400 font-medium">
-              <li><a href="#architecture" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-emerald-400 pl-3 -ml-[2px]">Under the Hood</a></li>
-              <li><a href="#sqlite-engine" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-emerald-400 pl-3 -ml-[2px]">SQLite NRG Engine</a></li>
-              <li><a href="#offline-first" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-emerald-400 pl-3 -ml-[2px]">Offline-First Guarantee</a></li>
-            </ul>
+            {renderNavLinks([
+              { id: 'architecture', label: 'Under the Hood' },
+              { id: 'sqlite-engine', label: 'SQLite NRG Engine' },
+              { id: 'offline-first', label: 'Offline-First Guarantee' }
+            ])}
           </div>
 
           <div>
-            <h5 className="font-mono text-xs font-bold uppercase tracking-wider text-amber-400 mb-3">
+            <h5 className="font-mono text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-2.5 px-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
               Practical Usage
             </h5>
-            <ul className="space-y-2 text-slate-400 font-medium">
-              <li><a href="#usage-local" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-amber-400 pl-3 -ml-[2px]">One-Command Local Workflow</a></li>
-              <li><a href="#usage-online" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-amber-400 pl-3 -ml-[2px]">🌐 Online GitHub Scanning</a></li>
-              <li><a href="#usage-ai" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-amber-400 pl-3 -ml-[2px]">Interactive AI Chatbot</a></li>
-              <li><a href="#usage-cli" className="hover:text-white transition-colors block py-1 border-l-2 border-transparent hover:border-amber-400 pl-3 -ml-[2px]">CLI Command Reference</a></li>
-            </ul>
+            {renderNavLinks([
+              { id: 'usage-local', label: 'One-Command Local' },
+              { id: 'usage-online', label: '🌐 Online GitHub Scan' },
+              { id: 'usage-ai', label: 'Interactive AI Chatbot' },
+              { id: 'usage-cli', label: 'CLI Command Table' }
+            ])}
           </div>
 
         </div>
@@ -424,25 +488,53 @@ export const GetStartedDocs = () => {
 
       </main>
 
-      {/* 3. Right Sidebar: "On this page" Anchor Jumps */}
-      <aside className="hidden xl:block w-52 flex-shrink-0">
-        <div className="sticky top-24 space-y-4 font-sans text-xs border-l border-slate-800 pl-4 text-slate-400">
-          <h6 className="font-mono font-bold uppercase tracking-wider text-slate-200">On this page</h6>
-          <ul className="space-y-2.5">
-            <li><a href="#introduction" className="hover:text-cyan-400 transition-colors block">What is CodeMRI?</a></li>
-            <li><a href="#installation" className="hover:text-cyan-400 transition-colors block">Quick Installation</a></li>
-            <li><a href="#why-codemri" className="hover:text-cyan-400 transition-colors block">Why CodeMRI?</a></li>
-            <li><a href="#pulse" className="hover:text-blue-400 transition-colors block">Core Functions</a></li>
-            <li><a href="#architecture" className="hover:text-emerald-400 transition-colors block">How It Works</a></li>
-            <li><a href="#usage-local" className="hover:text-amber-400 transition-colors block">Practical Usage &amp; Examples</a></li>
-            <li><a href="#usage-cli" className="hover:text-purple-400 transition-colors block">CLI Command Table</a></li>
+      {/* 3. Right Sidebar: "On this page" Anchor Jumps with Popup Capsule Style */}
+      <aside className="hidden xl:block w-56 flex-shrink-0">
+        <div className="sticky top-24 space-y-4 font-sans text-xs border-l border-slate-800/80 pl-4 text-slate-400">
+          <h6 className="font-mono font-bold uppercase tracking-wider text-slate-200 px-3">On this page</h6>
+          <ul className="space-y-1.5">
+            {[
+              { id: 'introduction', label: 'What is CodeMRI?' },
+              { id: 'installation', label: 'Quick Installation' },
+              { id: 'why-codemri', label: 'Why CodeMRI?' },
+              { id: 'pulse', label: 'Core Functions' },
+              { id: 'architecture', label: 'How It Works' },
+              { id: 'usage-local', label: 'Practical Usage & Examples' },
+              { id: 'usage-cli', label: 'CLI Command Table' }
+            ].map((item) => {
+              const isActive = activeId === item.id || 
+                (item.id === 'pulse' && ['shield', 'velocity', 'vision', 'cortex'].includes(activeId)) || 
+                (item.id === 'architecture' && ['sqlite-engine', 'offline-first'].includes(activeId)) || 
+                (item.id === 'usage-local' && ['usage-online', 'usage-ai'].includes(activeId));
+
+              return (
+                <li key={item.id}>
+                  <a
+                    href={`#${item.id}`}
+                    onClick={() => setActiveId(item.id)}
+                    className={`group flex items-center justify-between px-3.5 py-2 rounded-xl font-medium transition-all duration-200 border ${
+                      isActive
+                        ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 font-bold shadow-md shadow-cyan-500/15 translate-x-1'
+                        : 'border-transparent text-slate-400 hover:bg-slate-800/80 hover:border-slate-700/80 hover:text-white hover:translate-x-1.5'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    {isActive ? (
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-1.5" />
+                    ) : (
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 text-[10px] ml-1">→</span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
-          <div className="pt-4 border-t border-slate-800/80">
+          <div className="pt-4 border-t border-slate-800/80 px-2">
             <a
               href="https://github.com/KangBasrengg/MRI-Code/issues/new"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-cyan-400 hover:underline flex items-center gap-1 text-[11px]"
+              className="text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1 text-[11px] font-mono"
             >
               <span>Question or Feedback?</span>
               <ArrowRight className="w-3 h-3" />
