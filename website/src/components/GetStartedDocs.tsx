@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Copy, Check, Cpu, ArrowRight, Sparkles } from 'lucide-react';
+import { Copy, Check, Cpu, Sparkles } from 'lucide-react';
 
 export const GetStartedDocs = () => {
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -58,10 +58,10 @@ export const GetStartedDocs = () => {
               <a
                 href={`#${item.id}`}
                 onClick={() => setActiveId(item.id)}
-                className={`group flex items-center justify-between px-3.5 py-2 rounded-xl text-xs transition-all duration-200 border ${
+                className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all duration-200 border ${
                   isActive
-                    ? `bg-gradient-to-r from-cyan-500/25 via-blue-600/20 to-transparent border-cyan-500/60 text-cyan-300 font-black shadow-lg shadow-cyan-500/20 translate-x-2 scale-[1.02]`
-                    : `border-transparent text-slate-400 hover:bg-slate-800/90 hover:border-slate-700/80 hover:text-white hover:translate-x-1.5 hover:shadow-md hover:shadow-black/40`
+                    ? `bg-slate-950/95 border-cyan-400 text-cyan-300 font-black shadow-2xl shadow-black translate-x-2 scale-[1.02]`
+                    : `border-transparent text-slate-300 hover:bg-slate-950/90 hover:border-slate-700 hover:text-white hover:translate-x-1.5 hover:shadow-xl hover:shadow-black/80`
                 }`}
               >
                 <span className="truncate pr-1">{item.label}</span>
@@ -140,7 +140,7 @@ export const GetStartedDocs = () => {
       </aside>
 
       {/* 2. Main Center Content: Clean, High-Readability Prose */}
-      <main className="flex-1 max-w-4xl space-y-16 text-slate-300 pb-20">
+      <main className="flex-1 max-w-5xl space-y-16 text-slate-300 pb-20">
         
         {/* SECTION: INTRODUCTION */}
         <section id="introduction" className="space-y-6">
@@ -487,62 +487,6 @@ export const GetStartedDocs = () => {
         </section>
 
       </main>
-
-      {/* 3. Right Sidebar: "On this page" Anchor Jumps with Popup Capsule Style */}
-      <aside className="hidden xl:block w-56 flex-shrink-0">
-        <div className="sticky top-24 space-y-4 font-sans text-xs border-l border-slate-800/80 pl-4 text-slate-400">
-          <h6 className="font-mono font-bold uppercase tracking-wider text-slate-200 px-3">On this page</h6>
-          <ul className="space-y-1.5">
-            {[
-              { id: 'introduction', label: 'What is CodeMRI?' },
-              { id: 'installation', label: 'Quick Installation' },
-              { id: 'why-codemri', label: 'Why CodeMRI?' },
-              { id: 'pulse', label: 'Core Functions' },
-              { id: 'architecture', label: 'How It Works' },
-              { id: 'usage-local', label: 'Practical Usage & Examples' },
-              { id: 'usage-cli', label: 'CLI Command Table' }
-            ].map((item) => {
-              const isActive = activeId === item.id || 
-                (item.id === 'pulse' && ['shield', 'velocity', 'vision', 'cortex'].includes(activeId)) || 
-                (item.id === 'architecture' && ['sqlite-engine', 'offline-first'].includes(activeId)) || 
-                (item.id === 'usage-local' && ['usage-online', 'usage-ai'].includes(activeId));
-
-              return (
-                <li key={item.id}>
-                  <a
-                    href={`#${item.id}`}
-                    onClick={() => setActiveId(item.id)}
-                    className={`group flex items-center justify-between px-3.5 py-2 rounded-xl font-medium transition-all duration-200 border ${
-                      isActive
-                        ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 font-bold shadow-md shadow-cyan-500/15 translate-x-1'
-                        : 'border-transparent text-slate-400 hover:bg-slate-800/80 hover:border-slate-700/80 hover:text-white hover:translate-x-1.5'
-                    }`}
-                  >
-                    <span>{item.label}</span>
-                    {isActive ? (
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-1.5" />
-                    ) : (
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 text-[10px] ml-1">→</span>
-                    )}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="pt-4 border-t border-slate-800/80 px-2">
-            <a
-              href="https://github.com/KangBasrengg/MRI-Code/issues/new"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1 text-[11px] font-mono"
-            >
-              <span>Question or Feedback?</span>
-              <ArrowRight className="w-3 h-3" />
-            </a>
-          </div>
-        </div>
-      </aside>
-
     </div>
   );
 };

@@ -438,6 +438,55 @@ const dashboardHTML = `<!DOCTYPE html>
             </div>
         </div>
 
+        <!-- Persistent Floating Bubble Chat Widget (Cortex AI Copilot) -->
+        <div id="floating-chat-bubble-btn" onclick="toggleFloatingChat()" style="position: fixed; bottom: 25px; right: 25px; z-index: 9998; background: linear-gradient(135deg, #0284c7 0%, #0f172a 100%); border: 2px solid #38bdf8; border-radius: 50px; padding: 0.85rem 1.6rem; color: #fff; font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(2, 132, 199, 0.6), 0 0 15px rgba(56, 189, 248, 0.3); display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s; font-size: 1.05rem;">
+            <span style="font-size: 1.4rem;">🤖</span>
+            <span>Ask Cortex AI</span>
+            <span style="background: #10b981; width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+        </div>
+
+        <div id="floating-chat-modal" style="display: none; position: fixed; bottom: 90px; right: 25px; width: 450px; max-width: 92vw; height: 580px; max-height: 78vh; background: rgba(15, 23, 42, 0.98); border: 2px solid rgba(56, 189, 248, 0.6); border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.25); z-index: 9999; flex-direction: column; overflow: hidden; backdrop-filter: blur(16px);">
+            <!-- Modal Header -->
+            <div style="background: linear-gradient(90deg, #0369a1 0%, #0f172a 100%); padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.6rem;">🤖</span>
+                    <div>
+                        <strong style="color: #fff; font-size: 1.1rem; display: block;">Cortex AI Copilot</strong>
+                        <div style="font-size: 0.75rem; color: #a5f3fc; display: flex; align-items: center; gap: 0.35rem; margin-top: 2px;">
+                            <span style="display: inline-block; width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 5px #10b981;"></span> Active • freemodel.dev + SQLite NRG
+                        </div>
+                    </div>
+                </div>
+                <button onclick="toggleFloatingChat()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 1.2rem; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-weight: bold;">✕</button>
+            </div>
+
+            <!-- Modal Body (Chat History) -->
+            <div id="floating-chat-history" style="flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; background: rgba(8, 11, 18, 0.95);">
+                <div class="chat-message ai" style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                    <div style="background: #0284c7; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 1.1rem;">🤖</div>
+                    <div style="background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.9rem 1.1rem; border-radius: 12px; border-top-left-radius: 2px; color: var(--text-main); line-height: 1.5; font-size: 0.92rem;">
+                        <strong>👋 Hi! I'm Cortex AI Copilot.</strong>
+                        <p style="margin: 0.4rem 0 0 0;">Ask me anything about this repository's structure, functions, security vulnerabilities, or dependencies right here without leaving your view!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Quick Prompts -->
+            <div style="padding: 0.6rem 1.25rem; background: rgba(15, 23, 42, 0.9); border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 0.4rem; overflow-x: auto; white-space: nowrap;">
+                <button onclick="sendQuickPrompt('What does this repository do? Give me an overview of its functionality.')" style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); color: #a5f3fc; border-radius: 20px; padding: 0.25rem 0.65rem; font-size: 0.75rem; cursor: pointer;">💬 Repo Overview</button>
+                <button onclick="sendQuickPrompt('Explain the security architecture and if there are any hardcoded secret risks.')" style="background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: #fde047; border-radius: 20px; padding: 0.25rem 0.65rem; font-size: 0.75rem; cursor: pointer;">🛡️ Security Check</button>
+                <button onclick="sendQuickPrompt('What are the top architectural hotspots and most connected functions in the graph?')" style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: #6ee7b7; border-radius: 20px; padding: 0.25rem 0.65rem; font-size: 0.75rem; cursor: pointer;">⚙️ Top Hotspots</button>
+            </div>
+
+            <!-- Modal Footer (Input Box) -->
+            <div style="padding: 0.9rem 1.25rem; background: #0f172a; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" id="floating-chat-input-box" placeholder="Ask AI anything about the code..." onkeydown="if(event.key==='Enter') sendChatMessage('floating')" style="flex: 1; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 0.75rem 1rem; color: #fff; font-size: 0.92rem; outline: none;">
+                <button onclick="sendChatMessage('floating')" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: 1px solid #38bdf8; padding: 0.75rem 1.25rem; border-radius: 10px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 0.92rem; display: flex; align-items: center; gap: 0.35rem;">
+                    <span>Send</span> 🚀
+                </button>
+            </div>
+        </div>
+
         <footer>
             CodeMRI v1.0.0 (MRI) • Licensed under Apache 2.0 for Enterprise Patent Security • Built with ❤️ by Muhammad Nuril
         </footer>
@@ -866,39 +915,75 @@ const dashboardHTML = `<!DOCTYPE html>
             }
         }
 
-        // Cortex & freemodel.dev AI Chatbot Functions
-        function sendQuickPrompt(promptText) {
-            document.getElementById('chat-input-box').value = promptText;
-            sendChatMessage();
+        // Cortex & freemodel.dev AI Chatbot Functions (Synchronized across inline & floating views)
+        function toggleFloatingChat() {
+            const modal = document.getElementById('floating-chat-modal');
+            if (modal.style.display === 'none' || !modal.style.display) {
+                modal.style.display = 'flex';
+                document.getElementById('floating-chat-input-box').focus();
+            } else {
+                modal.style.display = 'none';
+            }
         }
 
-        async function sendChatMessage() {
-            const input = document.getElementById('chat-input-box');
-            const message = input.value.trim();
+        function sendQuickPrompt(promptText) {
+            const floatingModal = document.getElementById('floating-chat-modal');
+            if (floatingModal && floatingModal.style.display === 'flex') {
+                document.getElementById('floating-chat-input-box').value = promptText;
+                sendChatMessage('floating');
+            } else {
+                document.getElementById('chat-input-box').value = promptText;
+                sendChatMessage('main');
+            }
+        }
+
+        async function sendChatMessage(source = 'main') {
+            const input = source === 'floating' ? document.getElementById('floating-chat-input-box') : document.getElementById('chat-input-box');
+            let message = input ? input.value.trim() : '';
+            if (!message) {
+                const altInput = source === 'floating' ? document.getElementById('chat-input-box') : document.getElementById('floating-chat-input-box');
+                message = altInput ? altInput.value.trim() : '';
+                if (altInput) altInput.value = '';
+            }
             if (!message) return;
+            if (input) input.value = '';
 
-            const history = document.getElementById('chat-history');
+            const historyMain = document.getElementById('chat-history');
+            const historyFloating = document.getElementById('floating-chat-history');
             
-            const userDiv = document.createElement('div');
-            userDiv.style.display = 'flex';
-            userDiv.style.gap = '1rem';
-            userDiv.style.alignItems = 'flex-start';
-            userDiv.style.justifyContent = 'flex-end';
-            userDiv.innerHTML = '<div style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color: #fff; padding: 0.85rem 1.25rem; border-radius: 12px; border-top-right-radius: 2px; max-width: 80%; line-height: 1.5;">' + message + '</div>' +
-                                '<div style="background: #475569; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">👤</div>';
-            history.appendChild(userDiv);
-            input.value = '';
-            history.scrollTop = history.scrollHeight;
+            const userMsgHtml = '<div style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color: #fff; padding: 0.85rem 1.25rem; border-radius: 12px; border-top-right-radius: 2px; max-width: 80%; line-height: 1.5; font-size: 0.92rem;">' + message + '</div>' +
+                                '<div style="background: #475569; color: #fff; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 1rem;">👤</div>';
 
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = 'ai-loading-bubble';
-            loadingDiv.style.display = 'flex';
-            loadingDiv.style.gap = '1rem';
-            loadingDiv.style.alignItems = 'center';
-            loadingDiv.innerHTML = '<div style="background: #0284c7; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">🤖</div>' +
-                                   '<div style="color: #38bdf8; font-style: italic;">Cortex & freemodel.dev AI synthesizing structural answer...</div>';
-            history.appendChild(loadingDiv);
-            history.scrollTop = history.scrollHeight;
+            [historyMain, historyFloating].forEach(hist => {
+                if (hist) {
+                    const div = document.createElement('div');
+                    div.style.display = 'flex';
+                    div.style.gap = '0.75rem';
+                    div.style.alignItems = 'flex-start';
+                    div.style.justifyContent = 'flex-end';
+                    div.innerHTML = userMsgHtml;
+                    hist.appendChild(div);
+                    hist.scrollTop = hist.scrollHeight;
+                }
+            });
+
+            const loadingIdMain = 'ai-loading-bubble-main';
+            const loadingIdFloating = 'ai-loading-bubble-floating';
+            const loadMsgHtml = '<div style="background: #0284c7; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 1.1rem;">🤖</div>' +
+                                '<div style="color: #38bdf8; font-style: italic; font-size: 0.92rem;">Cortex & freemodel.dev AI synthesizing structural answer...</div>';
+
+            [ [historyMain, loadingIdMain], [historyFloating, loadingIdFloating] ].forEach(([hist, id]) => {
+                if (hist) {
+                    const lDiv = document.createElement('div');
+                    lDiv.id = id;
+                    lDiv.style.display = 'flex';
+                    lDiv.style.gap = '0.75rem';
+                    lDiv.style.alignItems = 'center';
+                    lDiv.innerHTML = loadMsgHtml;
+                    hist.appendChild(lDiv);
+                    hist.scrollTop = hist.scrollHeight;
+                }
+            });
 
             try {
                 const res = await fetch('/api/chat', {
@@ -908,13 +993,8 @@ const dashboardHTML = `<!DOCTYPE html>
                 });
                 const data = await res.json();
                 
-                const loader = document.getElementById('ai-loading-bubble');
-                if (loader) loader.remove();
-
-                const aiDiv = document.createElement('div');
-                aiDiv.style.display = 'flex';
-                aiDiv.style.gap = '1rem';
-                aiDiv.style.alignItems = 'flex-start';
+                document.getElementById(loadingIdMain)?.remove();
+                document.getElementById(loadingIdFloating)?.remove();
 
                 let contentHtml = '';
                 if (res.ok && data.reply) {
@@ -926,28 +1006,41 @@ const dashboardHTML = `<!DOCTYPE html>
                         .replace(/#### (.*?)(\n|$)/g, '<h5 style="color: #fbbf24; font-size: 0.95rem; margin: 0.5rem 0;">$1</h5>')
                         .replace(/\n/g, '<br>');
                     
-                    contentHtml = '<div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(56, 189, 248, 0.25); padding: 1rem 1.25rem; border-radius: 12px; border-top-left-radius: 2px; color: #f8fafc; line-height: 1.6; max-width: 85%; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">' + 
+                    contentHtml = '<div style="background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.95rem 1.15rem; border-radius: 12px; border-top-left-radius: 2px; color: #f8fafc; line-height: 1.6; max-width: 85%; font-size: 0.92rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">' + 
                                   formatted +
-                                  '<div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: #64748b; display: flex; justify-content: space-between;">' +
+                                  '<div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.12); font-size: 0.75rem; color: #64748b; display: flex; justify-content: space-between;">' +
                                     '<span>Engine: ' + (data.engine || 'Cortex AI') + '</span>' +
                                     '<span style="color: #34d399;">✔ Verified over SQLite NRG</span>' +
                                   '</div>' +
                                   '</div>';
                 } else {
-                    contentHtml = '<div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 1rem; border-radius: 12px;">❌ Failed to receive reply: ' + (data.error || 'Server error') + '</div>';
+                    contentHtml = '<div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 0.9rem; border-radius: 12px; font-size: 0.92rem;">❌ Failed to receive reply: ' + (data.error || 'Server error') + '</div>';
                 }
 
-                aiDiv.innerHTML = '<div style="background: #0284c7; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">🤖</div>' + contentHtml;
-                history.appendChild(aiDiv);
-                history.scrollTop = history.scrollHeight;
+                [historyMain, historyFloating].forEach(hist => {
+                    if (hist) {
+                        const aiDiv = document.createElement('div');
+                        aiDiv.style.display = 'flex';
+                        aiDiv.style.gap = '0.75rem';
+                        aiDiv.style.alignItems = 'flex-start';
+                        aiDiv.innerHTML = '<div style="background: #0284c7; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 1.1rem;">🤖</div>' + contentHtml;
+                        hist.appendChild(aiDiv);
+                        hist.scrollTop = hist.scrollHeight;
+                    }
+                });
             } catch (err) {
-                const loader = document.getElementById('ai-loading-bubble');
-                if (loader) loader.remove();
+                document.getElementById(loadingIdMain)?.remove();
+                document.getElementById(loadingIdFloating)?.remove();
 
-                const errDiv = document.createElement('div');
-                errDiv.style.color = '#ef4444';
-                errDiv.innerText = '❌ Communication with Cortex AI server failed.';
-                history.appendChild(errDiv);
+                [historyMain, historyFloating].forEach(hist => {
+                    if (hist) {
+                        const errDiv = document.createElement('div');
+                        errDiv.style.color = '#ef4444';
+                        errDiv.style.fontSize = '0.92rem';
+                        errDiv.innerText = '❌ Communication with Cortex AI server failed.';
+                        hist.appendChild(errDiv);
+                    }
+                });
             }
         }
     </script>
