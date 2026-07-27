@@ -1,33 +1,47 @@
 package cli
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
+	"github.com/KangBasrengg/MRI-Code/internal/graph"
+	"github.com/KangBasrengg/MRI-Code/internal/scanner"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
-type skeletonMeta struct {
-	Platform    string    `json:"platform"`
-	Version     string    `json:"version"`
-	Codename    string    `json:"codename"`
-	ScannedRoot string    `json:"scanned_root"`
-	Timestamp   time.Time `json:"timestamp"`
-	Status      string    `json:"status"`
+type repositoryMeta struct {
+	Platform       string                             `json:"platform"`
+	Version        string                             `json:"version"`
+	Codename       string                             `json:"codename"`
+	ScannedRoot    string                             `json:"scanned_root"`
+	Timestamp      time.Time                          `json:"timestamp"`
+	Status         string                             `json:"status"`
+	TotalFiles     int                                `json:"total_files"`
+	TotalBytes     int64                              `json:"total_bytes"`
+	TotalLOC       int                                `json:"total_loc"`
+	TotalComments  int                                `json:"total_comments"`
+	TotalBlank     int                                `json:"total_blank"`
+	GraphNodeCount int                                `json:"graph_node_count"`
+	GraphEdgeCount int                                `json:"graph_edge_count"`
+	LanguageStats  map[string]*scanner.LanguageSummary `json:"language_stats"`
+	ScanDuration   float64                            `json:"scan_duration_sec"`
 }
 
 var scanCmd = &cobra.Command{
 	Use:   "scan [repository_path]",
-	Short: "Scan target repository and initialize Neural Repository Graph (NRG)",
+	Short: "Scan repository, detect languages, run AST parsers, and compile Neural Repository Graph (NRG)",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		cyan := color.New(color.FgCyan, color.Bold).SprintFunc()
 		green := color.New(color.FgGreen, color.Bold).SprintFunc()
-		yellow := color.New(color.FgYellow).SprintFunc()
+		yellow := color.New(color.FgYellow, color.Bold).SprintFunc()
+		magenta := color.New(color.FgMagenta, color.Bold).SprintFunc()
 
 		targetDir := "."
 		if len(args) > 0 {
@@ -40,37 +54,115 @@ var scanCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("%s Starting Repository Scan on: %s\n", cyan("📡 [CodeMRI]"), yellow(absPath))
+		fmt.Printf("%s Starting Phase 03 Neuron Repository Scan on: %s\n", cyan("📡 [CodeMRI]"), yellow(absPath))
+		fmt.Println("⚡ Running syntax parsers & indexing SQLite relational graph...")
+		
 		startTime := time.Now()
+		ctx := context.Background()
 
-		// Step 1: Initialize .codemri repository data directory
-		dotDir := filepath.Join(absPath, ".codemri")
-		if err := os.MkdirAll(dotDir, 0755); err != nil {
-			fmt.Printf("❌ Failed to initialize local intelligence workspace (.codemri): %v\n", err)
+		// Step 1: Initialize high-speed concurrent Atlas Engine
+		engine := scanner.NewAtlasEngine()
+		cfg := scanner.ScanConfig{
+			RootPath:      absPath,
+			MaxWorkers:    8,
+			IncludeHidden: false,
+		}
+
+		res, err := engine.ExecuteScan(ctx, cfg)
+		if err != nil {
+			fmt.Printf("❌ Scan execution failed: %v\n", err)
 			return
 		}
 
-		// Step 2: Generate Genesis repository skeleton file
-		meta := skeletonMeta{
-			Platform:    "CodeMRI Neural Repository Intelligence",
-			Version:     Version,
-			Codename:    Codename,
-			ScannedRoot: absPath,
-			Timestamp:   time.Now(),
-			Status:      "GENESIS_INITIALIZED (Tree-sitter parser & NRG indexing queued for Phase 2 Atlas)",
+		// Step 2: Assemble Neural Repository Graph (NRG) - Single Source of Truth
+		nrg := graph.NewNRG(absPath, Version)
+		for _, ast := range res.ParsedASTs {
+			for _, node := range ast.Nodes {
+				nrg.Nodes[node.ID] = node
+			}
+			nrg.Edges = append(nrg.Edges, ast.Edges...)
+		}
+
+		// Step 3: Ensure .codemri repository workspace exists
+		dotDir := filepath.Join(absPath, ".codemri")
+		if err := os.MkdirAll(dotDir, 0755); err != nil {
+			fmt.Printf("❌ Failed to initialize local workspace (.codemri): %v\n", err)
+			return
+		}
+
+		// Step 4: Write compiled NRG Graph DB equivalent to JSON (human-readable backup)
+		graphBytes, _ := json.MarshalIndent(nrg, "", "  ")
+		graphPath := filepath.Join(dotDir, "graph.json")
+		if err := os.WriteFile(graphPath, graphBytes, 0644); err != nil {
+			fmt.Printf("❌ Failed to save compiled Neural Repository Graph JSON: %v\n", err)
+			return
+		}
+
+		// Step 4b: Persist NRG directly into SQLite database for microsecond relational queries (Phase 03 Neuron)
+		dbPath := filepath.Join(dotDir, "graph.db")
+		sqliteStore, err := graph.NewSQLiteStorage(dbPath)
+		if err != nil {
+			fmt.Printf("❌ Failed to open SQLite storage engine: %v\n", err)
+			return
+		}
+		if err := sqliteStore.SaveGraph(nrg); err != nil {
+			fmt.Printf("❌ Failed to persist NRG in SQLite database: %v\n", err)
+			sqliteStore.Close()
+			return
+		}
+		sqliteStore.Close()
+
+		// Step 5: Format Language Stats for representation
+		langStats := make(map[string]*scanner.LanguageSummary)
+		for lang, sum := range res.LanguageStats {
+			langStats[string(lang)] = sum
+		}
+
+		// Step 6: Save rich repository analytical metadata
+		meta := repositoryMeta{
+			Platform:       "CodeMRI Neural Repository Intelligence",
+			Version:        Version,
+			Codename:       Codename,
+			ScannedRoot:    absPath,
+			Timestamp:      time.Now(),
+			Status:         "PHASE_03_NEURON_COMPLETE (SQLite NRG Indexed & Verified)",
+			TotalFiles:     res.TotalFiles,
+			TotalBytes:     res.TotalBytes,
+			TotalLOC:       res.TotalLOC,
+			TotalComments:  res.TotalComments,
+			TotalBlank:     res.TotalBlank,
+			GraphNodeCount: len(nrg.Nodes),
+			GraphEdgeCount: len(nrg.Edges),
+			LanguageStats:  langStats,
+			ScanDuration:   res.DurationSec,
 		}
 
 		metaBytes, _ := json.MarshalIndent(meta, "", "  ")
 		metaPath := filepath.Join(dotDir, "repository.json")
 		if err := os.WriteFile(metaPath, metaBytes, 0644); err != nil {
-			fmt.Printf("❌ Failed to write skeleton metadata: %v\n", err)
+			fmt.Printf("❌ Failed to save analytical metadata: %v\n", err)
 			return
 		}
 
 		elapsed := time.Since(startTime)
-		fmt.Printf("✔ Local intelligence repository created at: %s\n", green(dotDir))
-		fmt.Printf("✔ Skeleton metadata generated: %s\n", green("repository.json"))
+
+		// Print comprehensive analytical dashboard summary
+		fmt.Println("\n---------------------------------------------------------")
+		fmt.Printf("%s AST & Relational Indexing Completed in %v\n", green("✔ [SUCCESS]"), elapsed)
+		fmt.Printf("📂 Files Scanned : %s | 📄 LOC: %s | 💬 Comments: %d\n", yellow(fmt.Sprintf("%d", res.TotalFiles)), yellow(fmt.Sprintf("%d", res.TotalLOC)), res.TotalComments)
+		fmt.Printf("🧠 Compiled NRG  : %s Nodes | %s Relational Edges (SQLite Indexed)\n", magenta(fmt.Sprintf("%d", len(nrg.Nodes))), magenta(fmt.Sprintf("%d", len(nrg.Edges))))
+		
+		if len(res.LanguageStats) > 0 {
+			fmt.Println("\n📊 Language Distribution:")
+			for lang, stat := range res.LanguageStats {
+				fmt.Printf("   ▪ %-12s : %6d lines (%.1f%%)\n", strings.ToUpper(string(lang)), stat.Lines, stat.Percentage)
+			}
+		}
+
 		fmt.Println("---------------------------------------------------------")
-		fmt.Printf("✨ Genesis scan check complete in %v! (Ready for Phase 02 Tree-sitter & AST Pipeline)\n", elapsed)
+		fmt.Printf("✔ SQLite relational database stored at: %s\n", green(dbPath))
+		fmt.Printf("✔ Human-readable graph JSON backup at:  %s\n", green(graphPath))
+		fmt.Printf("✔ Repository analytics saved at:         %s\n", green(metaPath))
+		fmt.Printf("🚀 Run %s or type one word %s to launch interactive graphical dashboard!\n", cyan("codemri serve"), cyan("codemri"))
 	},
 }

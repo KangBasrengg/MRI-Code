@@ -590,7 +590,7 @@ Parser mengubah repository menjadi Neural Repository Graph (NRG), yaitu represen
 Kalau konsep NRG ini berhasil diwujudkan dengan baik, menurutku CodeMRI akan memiliki identitas teknis yang kuat dan tidak terasa seperti "AI wrapper" biasa, melainkan platform analisis repository dengan fondasi arsitektur yang jelas. Itu juga akan memudahkan komunitas memahami mengapa proyek ini berbeda dari tool lain.
 
 ## Update plan ##
-## v0.1.0
+v0.1.0
 
 Project Skeleton
 

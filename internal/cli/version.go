@@ -10,11 +10,11 @@ import (
 
 const (
 	// Version is the current release version of CodeMRI.
-	Version = "v0.1.0"
+	Version = "v0.3.0"
 	// Codename represents the thematic title for this structural epoch.
-	Codename = "Genesis"
+	Codename = "Neuron"
 	// Architecture is the platform core structural engine.
-	Architecture = "Neural Repository Graph (NRG)"
+	Architecture = "Neural Repository Graph (NRG) - SQLite Relational Engine"
 )
 
 var versionCmd = &cobra.Command{

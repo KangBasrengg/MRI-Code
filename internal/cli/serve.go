@@ -1,11 +1,21 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"net"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
+	"strconv"
+	"time"
 
+	"github.com/KangBasrengg/MRI-Code/internal/graph"
 	"github.com/fatih/color"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/spf13/cobra"
 )
@@ -18,65 +28,197 @@ var serveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cyan := color.New(color.FgCyan, color.Bold).SprintFunc()
 		green := color.New(color.FgGreen).SprintFunc()
+		yellow := color.New(color.FgYellow).SprintFunc()
+
+		// 1. Resolve an available TCP port
+		activePort := resolveAvailablePort(port)
+		if activePort != port {
+			fmt.Printf("%s Port %s is already in use. Automatically switched to port %s.\n", yellow("⚠ [PORT CONFLICT]"), yellow(port), green(activePort))
+		}
+
+		// 2. Locate the .codemri workspace
+		cwd, _ := os.Getwd()
+		dotDir := filepath.Join(cwd, ".codemri")
+		repoMetaPath := filepath.Join(dotDir, "repository.json")
+		graphPath := filepath.Join(dotDir, "graph.json")
+
+		dbPath := filepath.Join(dotDir, "graph.db")
 
 		app := fiber.New(fiber.Config{
-			AppName:      "CodeMRI v0.1.0 (Genesis)",
+			AppName:               "CodeMRI v0.3.0 (Neuron)",
 			DisableStartupMessage: true,
+			ReadBufferSize:        65536,
 		})
 
 		app.Use(logger.New(logger.Config{
 			Format: "[${time}] ${status} - ${latency} ${method} ${path}\n",
 		}))
+		app.Use(cors.New())
 
-		// API endpoint checking system health and NRG status
+		// ─── API: System Status ───
 		app.Get("/api/status", func(c *fiber.Ctx) error {
 			return c.JSON(fiber.Map{
-				"platform":     "CodeMRI Repository Intelligence Platform",
-				"version":      Version,
-				"codename":     Codename,
-				"nrg_engine":   "ONLINE_INITIALIZED",
-				"architecture": "Single Source of Truth (ADR-0001)",
+				"platform":       "CodeMRI Repository Intelligence Platform",
+				"version":        Version,
+				"codename":       Codename,
+				"nrg_engine":     "NEURON_SQLITE_ONLINE",
+				"storage_engine": "Embedded SQLite Relational Index (.codemri/graph.db)",
+				"architecture":   "Single Source of Truth (ADR-0001)",
 			})
 		})
 
-		// Simple preview page for Genesis dashboard
-		app.Get("/", func(c *fiber.Ctx) error {
-			html := `
-			<!DOCTYPE html>
-			<html>
-			<head>
-				<title>CodeMRI Dashboard (Genesis)</title>
-				<style>
-					body { font-family: 'Inter', system-ui, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; align-items: center; justify-content: center; height: 90vh; margin: 0; }
-					.card { background: #1e293b; padding: 3rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2); border: 1px solid #334155; max-width: 600px; text-align: center; }
-					h1 { color: #38bdf8; font-size: 2.2rem; margin-bottom: 0.5rem; }
-					p { color: #94a3b8; line-height: 1.6; }
-					.badge { display: inline-block; background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f6; padding: 0.3rem 0.8rem; border-radius: 9999px; font-weight: bold; font-size: 0.85rem; margin-top: 1.5rem; }
-				</style>
-			</head>
-			<body>
-				<div class="card">
-					<h1>🧠 CodeMRI Dashboard</h1>
-					<p>"GitHub shows your files. CodeMRI shows how your software actually works."</p>
-					<div class="badge">Version v0.1.0 "Genesis" Server Active</div>
-					<p style="margin-top: 2rem; font-size: 0.9rem;">Neural Repository Graph (NRG) visualization & AI Reasoning Chat engine queued for Phase 05 (Vision).</p>
-				</div>
-			</body>
-			</html>
-			`
-			c.Set("Content-Type", "text/html")
-			return c.SendString(html)
+		// ─── API: Repository Metadata ───
+		app.Get("/api/repository", func(c *fiber.Ctx) error {
+			data, err := os.ReadFile(repoMetaPath)
+			if err != nil {
+				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/repository.json found. Run: codemri scan ."})
+			}
+			c.Set("Content-Type", "application/json")
+			return c.Send(data)
 		})
 
+		// ─── API: NRG Graph Data (Full Graph) ───
+		app.Get("/api/graph", func(c *fiber.Ctx) error {
+			// In Phase 3 Neuron, attempt to load cleanly from SQLite first
+			if sqliteStore, err := graph.NewSQLiteStorage(dbPath); err == nil {
+				defer sqliteStore.Close()
+				if nrg, loadErr := sqliteStore.LoadGraph(cwd); loadErr == nil {
+					return c.JSON(nrg)
+				}
+			}
+			// Fallback to JSON if SQLite DB not found or path mismatches
+			data, err := os.ReadFile(graphPath)
+			if err != nil {
+				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/graph.db or graph.json found. Run: codemri scan ."})
+			}
+			c.Set("Content-Type", "application/json")
+			return c.Send(data)
+		})
+
+		// ─── API: NRG Graph Summary (Microsecond SQLite Aggregation) ───
+		app.Get("/api/graph/summary", func(c *fiber.Ctx) error {
+			if sqliteStore, err := graph.NewSQLiteStorage(dbPath); err == nil {
+				defer sqliteStore.Close()
+				if summary, err := sqliteStore.GetTopologySummary(); err == nil {
+					return c.JSON(summary)
+				}
+			}
+
+			// Fallback for JSON
+			data, err := os.ReadFile(graphPath)
+			if err != nil {
+				return c.Status(404).JSON(fiber.Map{"error": "graph not found"})
+			}
+			var raw map[string]json.RawMessage
+			if err := json.Unmarshal(data, &raw); err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "parse error"})
+			}
+
+			// Count nodes by type
+			var nodes map[string]json.RawMessage
+			json.Unmarshal(raw["nodes"], &nodes)
+			var edges []json.RawMessage
+			json.Unmarshal(raw["edges"], &edges)
+
+			typeCounts := make(map[string]int)
+			for _, v := range nodes {
+				var n struct{ Type string `json:"type"` }
+				json.Unmarshal(v, &n)
+				typeCounts[n.Type]++
+			}
+
+			return c.JSON(fiber.Map{
+				"total_nodes":  len(nodes),
+				"total_edges":  len(edges),
+				"node_types":   typeCounts,
+				"storage_type": "JSON Fallback",
+			})
+		})
+
+		// ─── API: Relational Graph Querying (Phase 3 Neuron Feature) ───
+		app.Get("/api/graph/node/:id", func(c *fiber.Ctx) error {
+			sqliteStore, err := graph.NewSQLiteStorage(dbPath)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "sqlite database unavailable"})
+			}
+			defer sqliteStore.Close()
+
+			nodeID := c.Params("id")
+			node, err := sqliteStore.FindNodeByID(nodeID)
+			if err != nil {
+				return c.Status(404).JSON(fiber.Map{"error": err.Error()})
+			}
+			return c.JSON(node)
+		})
+
+		app.Get("/api/graph/neighbors/:id/:edge", func(c *fiber.Ctx) error {
+			sqliteStore, err := graph.NewSQLiteStorage(dbPath)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "sqlite database unavailable"})
+			}
+			defer sqliteStore.Close()
+
+			nodeID := c.Params("id")
+			edgeType := graph.EdgeType(c.Params("edge"))
+			neighbors, err := sqliteStore.FindNeighbors(nodeID, edgeType)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			}
+			return c.JSON(neighbors)
+		})
+
+		// ─── Dashboard: Rich Interactive HTML ───
+		app.Get("/", func(c *fiber.Ctx) error {
+			c.Set("Content-Type", "text/html; charset=utf-8")
+			return c.SendString(dashboardHTML)
+		})
+
+		url := "http://localhost:" + activePort
 		underline := color.New(color.Underline).SprintFunc()
-		fmt.Printf("%s Dashboard Server Starting on port: %s\n", cyan("🌐 [CodeMRI Serve]"), green(port))
-		fmt.Printf("👉 Access local intelligence UI at: %s\n", underline("http://localhost:"+port))
+		fmt.Printf("%s Dashboard Server Starting on port: %s\n", cyan("🌐 [CodeMRI Serve]"), green(activePort))
+		fmt.Printf("👉 Access local intelligence UI at: %s\n", underline(url))
 		fmt.Println("Press Ctrl+C to shut down the server.")
-		
-		if err := app.Listen(":" + port); err != nil {
+
+		go func() {
+			time.Sleep(400 * time.Millisecond)
+			openBrowser(url)
+		}()
+
+		if err := app.Listen(":" + activePort); err != nil {
 			log.Fatalf("Server terminated: %v", err)
 		}
 	},
+}
+
+func resolveAvailablePort(startPortStr string) string {
+	startPort, err := strconv.Atoi(startPortStr)
+	if err != nil {
+		return startPortStr
+	}
+	for i := 0; i < 20; i++ {
+		currPort := strconv.Itoa(startPort + i)
+		ln, err := net.Listen("tcp", ":"+currPort)
+		if err == nil {
+			ln.Close()
+			return currPort
+		}
+	}
+	return startPortStr
+}
+
+func openBrowser(url string) {
+	var err error
+	switch runtime.GOOS {
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		err = exec.Command("xdg-open", url).Start()
+	}
+	if err == nil {
+		fmt.Println("🚀 Opened interactive dashboard in system browser automatically!")
+	}
 }
 
 func init() {
