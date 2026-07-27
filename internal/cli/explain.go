@@ -70,7 +70,8 @@ Examples:
 			fmt.Println(cyan("💡 CORTEX CONVERSATIONAL INTELLIGENCE (" + chatResp.Engine + ")"))
 			fmt.Println("═══════════════════════════════════════════════════")
 			fmt.Println(white(chatResp.Reply))
-			fmt.Println("═══════════════════════════════════════════════════\n")
+			fmt.Println("═══════════════════════════════════════════════════")
+			fmt.Println("")
 		}
 
 		// Search NRG for relevant nodes
