@@ -357,6 +357,34 @@ const dashboardHTML = `<!DOCTYPE html>
             </div>
         </div>
 
+        <div class="section-wide" style="border-color: rgba(245, 158, 11, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="margin-bottom: 0;">🛡️ Phase 07 ("Shield") Security Intelligence & Secret Scanning</h2>
+                <span class="storage-pill" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); font-weight: bold;" id="security-grade-badge">Checking security grade...</span>
+            </div>
+            <p style="color: var(--text-muted); line-height: 1.8;">
+                Shield executes local structural pattern recognition over your codebase to detect hardcoded secrets (AWS keys, GitHub tokens, database credentials, JWTs) and injection patterns (SQLi risks, unsafe innerHTML XSS, eval execution) entirely offline without sending proprietary code to cloud CVE servers. Saved to 
+                <code style="color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">.codemri/security.json</code>.
+            </p>
+            <div id="security-findings-area" style="margin-top: 1.5rem;">
+                <div class="suggestion-box">🔍 Scanning offline structural vulnerability signatures...</div>
+            </div>
+        </div>
+
+        <div class="section-wide" style="border-color: rgba(16, 185, 129, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="margin-bottom: 0;">🚀 Phase 08 ("Velocity") Performance Intelligence & Modular Health</h2>
+                <span class="storage-pill" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.4); font-weight: bold;" id="performance-grade-badge">Checking performance grade...</span>
+            </div>
+            <p style="color: var(--text-muted); line-height: 1.8;">
+                Velocity inspects build compilation bottlenecks, massive source file payloads (>50KB/file), tightly coupled module density (>15 imports per module), and namespace collisions across directory boundaries. Saved to 
+                <code style="color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">.codemri/performance.json</code>.
+            </p>
+            <div id="performance-suggestions-area" style="margin-top: 1.5rem;">
+                <div class="suggestion-box">📦 Calculating import costs and bundling footprint...</div>
+            </div>
+        </div>
+
         <footer>
             CodeMRI v1.0.0 (MRI) • Licensed under Apache 2.0 for Enterprise Patent Security • Built with ❤️ by Muhammad Nuril
         </footer>
@@ -469,6 +497,65 @@ const dashboardHTML = `<!DOCTYPE html>
                     }
                 }
                 
+                // Fetch Shield Security Intelligence (.codemri/security.json)
+                const secRes = await fetch('/api/security');
+                if (secRes.ok) {
+                    const secData = await secRes.json();
+                    const badge = document.getElementById('security-grade-badge');
+                    if (badge && secData.security_grade) badge.innerText = 'Security: ' + secData.security_grade;
+                    
+                    const secArea = document.getElementById('security-findings-area');
+                    if (secData.findings && secData.findings.length > 0) {
+                        secArea.innerHTML = '<h3 style="font-size: 1.1rem; color: #fbbf24; margin-bottom: 0.5rem;">🚨 Vulnerability Findings Discovered:</h3>';
+                        const maxDisplay = 5;
+                        for (let i = 0; i < Math.min(secData.findings.length, maxDisplay); i++) {
+                            const f = secData.findings[i];
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-box';
+                            div.innerHTML = '<strong>[' + f.severity + ']</strong> ' + f.description + ' <em style="color: #94a3b8; font-size: 0.85em;">— ' + f.file_path + ':' + f.line_number + '</em>';
+                            secArea.appendChild(div);
+                        }
+                        if (secData.findings.length > maxDisplay) {
+                            const more = document.createElement('div');
+                            more.style.color = '#64748b';
+                            more.style.fontSize = '0.85rem';
+                            more.style.marginTop = '0.5rem';
+                            more.innerText = '... and ' + (secData.findings.length - maxDisplay) + ' more findings available in .codemri/security.json';
+                            secArea.appendChild(more);
+                        }
+                    } else {
+                        secArea.innerHTML = '<div class="suggestion-box" style="color: #34d399; border-left-color: #10b981;">✔ Zero security vulnerabilities or exposed secrets detected!</div>';
+                    }
+                } else {
+                    document.getElementById('security-findings-area').innerHTML = '<div class="suggestion-box" style="color: #64748b;">ℹ️ No security scan cached yet. Run <code>codemri analyze .</code> in your terminal to generate security insights.</div>';
+                }
+
+                // Fetch Velocity Performance Intelligence (.codemri/performance.json)
+                const perfRes = await fetch('/api/performance');
+                if (perfRes.ok) {
+                    const perfData = await perfRes.json();
+                    const badge = document.getElementById('performance-grade-badge');
+                    if (badge && perfData.performance_grade) badge.innerText = 'Performance: ' + perfData.performance_grade;
+                    
+                    const perfArea = document.getElementById('performance-suggestions-area');
+                    if (perfData.suggestions && perfData.suggestions.length > 0) {
+                        perfArea.innerHTML = '<h3 style="font-size: 1.1rem; color: #34d399; margin-bottom: 0.5rem;">💡 Performance Optimization Advice:</h3>';
+                        for (const s of perfData.suggestions) {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-box';
+                            div.style.borderLeftColor = '#34d399';
+                            div.innerText = s;
+                            perfArea.appendChild(div);
+                        }
+                    } else {
+                        const totalBytes = perfData.total_size_bytes || 0;
+                        const totalFiles = perfData.total_files_scanned || 0;
+                        perfArea.innerHTML = '<div class="suggestion-box" style="color: #34d399; border-left-color: #10b981;">✔ Total source codebase size is optimal (' + totalBytes + ' bytes across ' + totalFiles + ' files).</div>';
+                    }
+                } else {
+                    document.getElementById('performance-suggestions-area').innerHTML = '<div class="suggestion-box" style="color: #64748b;">ℹ️ No performance analysis cached yet. Run <code>codemri analyze .</code> in your terminal to generate insights.</div>';
+                }
+
                 // Initialize Phase 5 Vision Interactive Canvas & Physics
                 initTopologyCanvas();
             } catch (err) {
