@@ -1043,6 +1043,8 @@ const dashboardHTML = `<!DOCTYPE html>
                 });
             }
         }
+
+        window.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
 </html>`
