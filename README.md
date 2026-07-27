@@ -5,8 +5,8 @@
 
 *"GitHub shows your syntax and file lists. CodeMRI reveals how your software actually thinks and executes."*
 
-[![Version](https://img.shields.io/badge/Release-v0.4.0__Pulse-EC4899?style=for-the-badge&logo=go&logoColor=white&labelColor=080b12)](https://github.com/KangBasrengg/MRI-Code/releases)
-[![Engine: Pulse & SQLite](https://img.shields.io/badge/Engine-Pulse__Health__Analytics-10B981?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/phases/phase-04-pulse.md)
+[![Version](https://img.shields.io/badge/Release-v0.5.0__Vision-6366F1?style=for-the-badge&logo=go&logoColor=white&labelColor=080b12)](https://github.com/KangBasrengg/MRI-Code/releases)
+[![Engine: Vision & SQLite](https://img.shields.io/badge/Engine-Vision__Topology__Canvas-10B981?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/phases/phase-05-vision.md)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25__Offline__CPU-3B82F6?style=for-the-badge&logo=security&logoColor=white&labelColor=080b12)](docs/philosophy.md)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F59E0B.svg?style=for-the-badge&labelColor=080b12)](https://opensource.org/licenses/Apache-2.0)
 
@@ -59,12 +59,13 @@ codemri
 
 ---
 
-## 💎 Features & Architecture Highlights (v0.4.0 Pulse)
+## 💎 Features & Architecture Highlights (v0.5.0 Vision)
 
-- **💓 Automated Repository Health Score & Debt Engine:** Phase 4 ("Pulse") algorithmically computes an overall repository letter grade (A+ to F), isolates uncalled dead code symbols, and exposes circular package dependencies instantly using `codemri analyze .`!
+- **🕸️ Interactive Force-Directed Topology Canvas:** Phase 5 ("Vision") introduces a 60FPS physics-driven graph visualization at `localhost:4000`. Click any symbol node to instantly calculate its architectural impact radius, upstream dependents, and downstream dependencies.
+- **💓 Automated Repository Health Score & Debt Engine:** Algorithmically computes an overall repository letter grade (A+ to F), isolates uncalled dead code symbols, and exposes circular package dependencies instantly using `codemri analyze .`!
 - **🚀 Sub-Millisecond Relational Engine:** Powered by a pure-Go embedded SQLite graph database (`.codemri/graph.db`). Query dependencies and architectural bonds across 100k+ lines of code in sub-millisecond latencies.
-- **🛡️ 100% Local & Offline Privacy:** All parsing, graph indexing, and technical debt diagnostics run locally on your CPU and disk. Your proprietary code is never uploaded or exposed.
-- **🎨 Reactive Interactive Dashboard:** When you run `codemri`, it spins up a local high-speed Fiber server on port 4000 displaying live health scores, circular loop diagrams, and AI reasoning recommendations directly in your browser.
+- **🛡️ 100% Local & Offline Privacy:** All parsing, graph indexing, topology rendering, and technical debt diagnostics run locally on your CPU and disk. Your proprietary code is never uploaded or exposed.
+- **🎨 Reactive Interactive Dashboard:** When you run `codemri`, it spins up a local high-speed Fiber server on port 4000 displaying live health scores, force-directed topology canvas, and AI reasoning recommendations directly in your browser.
 - **🔍 Universal Deterministic Syntax Parser:** Built-in multi-language AST classification supporting Go, TypeScript, JavaScript, Python, Java, PHP, Rust, SQL, HTML, CSS, and Docker without external runtime SDKs.
 - **🩺 Environmental Health Diagnostics:** Verify your local machine readiness anytime with a single diagnostic run:
   ```bash
@@ -83,7 +84,7 @@ CodeMRI follows strict iterative engineering discipline where every release repr
 | **v0.2.0** | 🗺️ **Atlas** | High-speed concurrent worker pools, multi-language syntax AST parsing | **✅ RELEASED** | [Read Spec](docs/phases/phase-02-atlas.md) |
 | **v0.3.0** | 🧠 **Neuron** | CGO-free embedded SQLite relational graph indexing (`graph.db`), API querying | **✅ RELEASED** | [Read Spec](docs/phases/phase-03-neuron.md) |
 | **v0.4.0** | 💓 **Pulse** | Dead code discovery, circular dependency loops, complexity & repository health scoring | **✅ RELEASED** | [Read Spec](docs/phases/phase-04-pulse.md) |
-| **v0.5.0** | 👁️ **Vision** | Interactive visual web canvas (Force-directed graph 2D/3D topology nodes) | *In Progress* | — |
+| **v0.5.0** | 👁️ **Vision** | Interactive force-directed topology canvas & instant impact analysis engine | **✅ RELEASED** | [Read Spec](docs/phases/phase-05-vision.md) |
 | **v0.6.0** | ⚡ **Cortex** | Offline & targeted AI reasoning endpoints over NRG nodes (Ollama/Claude/GPT) | *Planned* | — |
 | **v0.7.0** | 🛡️ **Shield** | Structural security intelligence (Secrets detection, dependency CVE verification) | *Planned* | — |
 | **v0.8.0** | 🚀 **Velocity** | Performance compilation insights & bundling bottleneck diagnostics | *Planned* | — |
@@ -96,7 +97,8 @@ CodeMRI follows strict iterative engineering discipline where every release repr
 
 We believe in absolute transparency and building developer understanding over mindless code generation:
 - **[📜 The CodeMRI Product Philosophy & Adoption Manifesto](docs/philosophy.md)**
-- **[📐 ADR 0001: Neural Repository Graph (NRG) as Single Source of Truth](docs/ADR/0001-neural-repository-graph.md)**
+- **[📐 ADR-0001: Neural Repository Graph (NRG) as Single Source of Truth](docs/ADR/0001-neural-repository-graph.md)**
+- **[🛡️ ADR-0002: Local Privacy — Zero Cloud Transmission Policy](docs/ADR/0002-local-privacy.md)**
 - **[🌐 Official Web Landing Page & Documentation Portal](website/)**
 
 ---
@@ -105,9 +107,10 @@ We believe in absolute transparency and building developer understanding over mi
 
 CodeMRI is licensed under the commercial-friendly **Apache 2.0 License**, guaranteeing complete patent security and free forever usage of the core CLI engine. Contributions, feature suggestions, and bug reports are warmly welcomed!
 
-1. Check our [Pull Request Guidelines](.github/pull_request_template.md).
-2. Fork the repository and build from source using `make build` or `go test ./...`.
-3. Submit your pull request adhering to Conventional Commits!
+1. Read our **[Contributing Guide](CONTRIBUTING.md)** for setup, coding standards, and commit conventions.
+2. Use our [Issue Templates](.github/ISSUE_TEMPLATE/) to report bugs, request features, or ask questions.
+3. Check the [Pull Request Guidelines](.github/pull_request_template.md).
+4. Fork the repository, build from source with `make build` or `go test ./...`, and submit your PR!
 
 <div align="center">
   <br>
