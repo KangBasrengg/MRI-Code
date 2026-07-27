@@ -324,7 +324,7 @@ func (s *SQLiteStorage) GetTopologySummary() (map[string]interface{}, error) {
 		"total_edges":    totalEdges,
 		"node_types":     nodeTypes,
 		"edge_types":     edgeTypes,
-		"storage_engine": "SQLite Relational Engine (Phase 3 Neuron)",
+		"storage_engine": "SQLite Relational & Pulse Engine (v0.4.0)",
 	}, nil
 }
 

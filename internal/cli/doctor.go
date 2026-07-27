@@ -45,15 +45,15 @@ var doctorCmd = &cobra.Command{
 			fmt.Printf("✖ Disk Permission Check: %s (%v)\n", red("FAILED"), err)
 			allPassed = false
 		} else {
-			// 4. Check Phase 03 Neuron SQLite Embedded Storage Engine
-			testDbPath := filepath.Join(testDir, "test_neuron.db")
+			// 4. Check Phase 04 Pulse SQLite Embedded Storage Engine
+			testDbPath := filepath.Join(testDir, "test_pulse.db")
 			sqliteStore, dbErr := graph.NewSQLiteStorage(testDbPath)
 			if dbErr != nil {
 				fmt.Printf("✖ SQLite Relational Engine Check: %s (%v)\n", red("FAILED"), dbErr)
 				allPassed = false
 			} else {
 				sqliteStore.Close()
-				fmt.Printf("✔ SQLite Relational Engine (Neuron): %s (CGO-free embedded graph querying active)\n", green("ONLINE"))
+				fmt.Printf("✔ SQLite Relational & Pulse Engine (v0.4.0): %s (CGO-free embedded graph & technical debt intelligence active)\n", green("ONLINE"))
 			}
 
 			_ = os.RemoveAll(testDir)
@@ -70,9 +70,9 @@ var doctorCmd = &cobra.Command{
 			fmt.Printf("✔ TCP Port %s Availability: %s (Ready to serve local interactive dashboard)\n", port, green("OPEN"))
 		}
 
-		fmt.Println("---------------------------------------------------------")
+		fmt.Println("──────────────────────────────────────────────────────────────────────────")
 		if allPassed {
-			fmt.Println(green("🎉 All diagnostic tests passed! CodeMRI Neuron engine is 100% operational."))
+			fmt.Println(green("🎉 All diagnostic tests passed! CodeMRI Pulse engine (v0.4.0) is 100% operational."))
 		} else {
 			fmt.Println(color.YellowString("⚠️ Some diagnostic tests raised warnings. See details above."))
 		}

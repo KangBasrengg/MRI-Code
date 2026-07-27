@@ -55,7 +55,7 @@ var scanCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("%s Starting Phase 03 Neuron Repository Scan on: %s\n", cyan("📡 [CodeMRI]"), yellow(absPath))
+		fmt.Printf("%s Starting Phase 04 Pulse Repository Scan on: %s\n", cyan("📡 [CodeMRI]"), yellow(absPath))
 		fmt.Println("⚡ Running syntax parsers & indexing SQLite relational graph...")
 		
 		startTime := time.Now()
