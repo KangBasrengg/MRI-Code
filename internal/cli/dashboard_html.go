@@ -1,13 +1,13 @@
 package cli
 
 // dashboardHTML is an embedded responsive modern dashboard UI that dynamically fetches
-// and renders real analytical data from /api/repository and /api/graph/summary backed by SQLite.
+// and renders real analytical data from /api/repository, /api/graph/summary, and /api/pulse.
 const dashboardHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeMRI Dashboard — Neural Repository Intelligence (Neuron v0.3.0)</title>
+    <title>CodeMRI Dashboard — Neural Repository Intelligence (Pulse v0.4.0)</title>
     <style>
         :root {
             --bg-base: #080b12;
@@ -16,6 +16,8 @@ const dashboardHTML = `<!DOCTYPE html>
             --accent-cyan: #00f2ff;
             --accent-blue: #3b82f6;
             --accent-emerald: #10b981;
+            --accent-pink: #ec4899;
+            --accent-amber: #f59e0b;
             --text-main: #e2e8f0;
             --text-muted: #94a3b8;
         }
@@ -54,7 +56,7 @@ const dashboardHTML = `<!DOCTYPE html>
         .logo-area h1 {
             font-size: 1.8rem;
             font-weight: 900;
-            background: linear-gradient(90deg, #00f2ff, #38bdf8, #10b981);
+            background: linear-gradient(90deg, #00f2ff, #38bdf8, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -66,9 +68,9 @@ const dashboardHTML = `<!DOCTYPE html>
         }
 
         .status-badge {
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            color: #34d399;
+            background: rgba(236, 72, 153, 0.12);
+            border: 1px solid rgba(236, 72, 153, 0.35);
+            color: #f472b6;
             padding: 0.5rem 1.2rem;
             border-radius: 9999px;
             font-weight: 700;
@@ -76,16 +78,16 @@ const dashboardHTML = `<!DOCTYPE html>
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.25);
         }
 
         .pulse {
             width: 9px;
             height: 9px;
-            background-color: #34d399;
+            background-color: #f472b6;
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 10px #34d399;
+            box-shadow: 0 0 10px #f472b6;
         }
 
         .grid {
@@ -180,16 +182,16 @@ const dashboardHTML = `<!DOCTYPE html>
             gap: 0.5rem;
         }
 
-        .nrg-banner {
-            background: rgba(59, 130, 246, 0.08);
-            border: 1px solid rgba(59, 130, 246, 0.25);
+        .pulse-banner {
+            background: rgba(236, 72, 153, 0.08);
+            border: 1px solid rgba(236, 72, 153, 0.25);
             border-radius: 1rem;
             padding: 1.5rem;
-            color: #bfdbfe;
+            color: #fbcfe8;
             margin-top: 1.5rem;
             font-size: 0.95rem;
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             align-items: center;
         }
 
@@ -202,6 +204,16 @@ const dashboardHTML = `<!DOCTYPE html>
             border-radius: 6px;
             font-family: monospace;
             font-weight: 700;
+        }
+
+        .suggestion-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 0.8rem 1.2rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: #e2e8f0;
         }
 
         footer {
@@ -221,13 +233,37 @@ const dashboardHTML = `<!DOCTYPE html>
                 <p>Offline-First Neural Repository Intelligence Platform</p>
             </div>
             <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
-                <span class="storage-pill" id="storage-engine-badge">SQLite Relational Engine (.codemri/graph.db)</span>
+                <span class="storage-pill" id="storage-engine-badge">SQLite Relational & Pulse Engine</span>
                 <div class="status-badge">
                     <span class="pulse"></span>
-                    <span id="engine-status">NEURON v0.3.0 ACTIVE</span>
+                    <span id="engine-status">PULSE v0.4.0 ACTIVE</span>
                 </div>
             </div>
         </header>
+
+        <div class="grid">
+            <div class="panel" style="border-color: rgba(236, 72, 153, 0.3);">
+                <div>
+                    <div class="panel-title" style="color: var(--accent-pink);">💓 Repository Health Score</div>
+                    <div class="metric-big" id="health-score">100 / 100</div>
+                </div>
+                <div class="metric-sub"><span id="health-grade-text" style="font-weight: bold; color: #34d399;">Grade A+</span> • <span id="health-debt">Evaluating architectural technical debt...</span></div>
+            </div>
+            <div class="panel">
+                <div>
+                    <div class="panel-title">🧟 Dead Code & Isolation</div>
+                    <div class="metric-big" id="dead-code-count">0</div>
+                </div>
+                <div class="metric-sub">Symbols receiving zero incoming relational bindings</div>
+            </div>
+            <div class="panel">
+                <div>
+                    <div class="panel-title">🔁 Circular Dependency Loops</div>
+                    <div class="metric-big" id="circular-count">0</div>
+                </div>
+                <div class="metric-sub">Cyclical import bindings in SQLite NRG</div>
+            </div>
+        </div>
 
         <div class="grid">
             <div class="panel">
@@ -275,23 +311,18 @@ const dashboardHTML = `<!DOCTYPE html>
         </div>
 
         <div class="section-wide">
-            <h2>💎 Phase 03 ("Neuron") Relational Graph Database Active</h2>
+            <h2>💎 Phase 04 ("Pulse") Architectural Technical Debt & Health Online</h2>
             <p style="color: var(--text-muted); line-height: 1.8;">
-                In Phase 3, CodeMRI upgrades its storage engine from simple JSON flat files to an embedded high-performance <strong>SQLite Relational Graph Engine</strong> stored natively at 
-                <code style="color: #00f2ff; background: rgba(0, 242, 255, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">.codemri/graph.db</code>. 
-                This enables sub-millisecond relational queries across thousands of structural symbols and dependency bonds without RAM exhaustion.
+                In Phase 4, CodeMRI integrates advanced technical debt algorithms directly over the <strong>Neural Repository Graph (NRG)</strong>. By treating the SQLite graph database at 
+                <code style="color: #f472b6; background: rgba(236, 72, 153, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">.codemri/pulse.json</code> as the Single Source of Truth, CodeMRI instantly calculates cyclomatic symbol density, discovers unreferenced dead code, and exposes architectural circular dependency loops without cloud latency.
             </p>
-            <div class="nrg-banner">
-                <div style="font-size: 2rem;">⚡</div>
-                <div>
-                    <strong>Microsecond Relational Queries & AI Readiness</strong><br>
-                    With Neuron active, external AI reasoning tools and developers can execute fast SQL joins over symbol callers, dependents, and architectural layers via standard local APIs (e.g. <code>/api/graph/neighbors/ID/TYPE</code>).
-                </div>
+            <div id="suggestions-area" style="margin-top: 1.5rem;">
+                <div class="suggestion-box">✨ Initializing automated AI reasoning structural recommendations...</div>
             </div>
         </div>
 
         <footer>
-            CodeMRI v0.3.0 (Neuron) • Licensed under Apache 2.0 for Enterprise Patent Security • Built with ❤️ by Muhammad Nuril
+            CodeMRI v0.4.0 (Pulse) • Licensed under Apache 2.0 for Enterprise Patent Security • Built with ❤️ by Muhammad Nuril
         </footer>
     </div>
 
@@ -360,6 +391,44 @@ const dashboardHTML = `<!DOCTYPE html>
                             li.className = 'list-item';
                             li.innerHTML = '<span>' + type + '</span><span class="tag" style="color: #60a5fa;">' + count.toLocaleString() + ' Bonds</span>';
                             edgeUl.appendChild(li);
+                        }
+                    }
+                }
+
+                // Fetch Pulse Analytics & Technical Debt (.codemri/pulse.json)
+                const pulseRes = await fetch('/api/pulse');
+                if (pulseRes.ok) {
+                    const pulseData = await pulseRes.json();
+                    if (pulseData.health) {
+                        const h = pulseData.health;
+                        document.getElementById('health-score').innerText = h.overall_score + ' / 100';
+                        document.getElementById('health-grade-text').innerText = 'Grade ' + h.grade;
+                        document.getElementById('health-debt').innerText = h.debt_status;
+                        
+                        if (h.overall_score < 65) {
+                            document.getElementById('health-score').style.color = '#ef4444';
+                        } else if (h.overall_score < 80) {
+                            document.getElementById('health-score').style.color = '#f59e0b';
+                        }
+                    }
+                    
+                    const deadCount = (pulseData.dead_code_issues || []).length;
+                    const circCount = (pulseData.circular_dependencies || []).length;
+                    document.getElementById('dead-code-count').innerText = deadCount.toLocaleString();
+                    document.getElementById('circular-count').innerText = circCount.toLocaleString();
+
+                    if (deadCount > 0) document.getElementById('dead-code-count').style.color = '#f59e0b';
+                    if (circCount > 0) document.getElementById('circular-count').style.color = '#ef4444';
+
+                    // Render AI Reasoning Suggestions
+                    const suggArea = document.getElementById('suggestions-area');
+                    if (pulseData.health && pulseData.health.suggestions && pulseData.health.suggestions.length > 0) {
+                        suggArea.innerHTML = '<h3 style="font-size: 1.1rem; color: #38bdf8; margin-bottom: 0.5rem;">💡 Actionable Architectural Advice:</h3>';
+                        for (const s of pulseData.health.suggestions) {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-box';
+                            div.innerText = s;
+                            suggArea.appendChild(div);
                         }
                     }
                 }

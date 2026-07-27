@@ -5,8 +5,8 @@
 
 *"GitHub shows your syntax and file lists. CodeMRI reveals how your software actually thinks and executes."*
 
-[![Version](https://img.shields.io/badge/Release-v0.3.0__Neuron-00F2FF?style=for-the-badge&logo=go&logoColor=black&labelColor=080b12)](https://github.com/KangBasrengg/MRI-Code/releases)
-[![Engine: SQLite NRG](https://img.shields.io/badge/Engine-SQLite__Relational__Graph-10B981?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/phases/phase-03-neuron.md)
+[![Version](https://img.shields.io/badge/Release-v0.4.0__Pulse-EC4899?style=for-the-badge&logo=go&logoColor=white&labelColor=080b12)](https://github.com/KangBasrengg/MRI-Code/releases)
+[![Engine: Pulse & SQLite](https://img.shields.io/badge/Engine-Pulse__Health__Analytics-10B981?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/phases/phase-04-pulse.md)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25__Offline__CPU-3B82F6?style=for-the-badge&logo=security&logoColor=white&labelColor=080b12)](docs/philosophy.md)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F59E0B.svg?style=for-the-badge&labelColor=080b12)](https://opensource.org/licenses/Apache-2.0)
 
@@ -59,11 +59,12 @@ codemri
 
 ---
 
-## 💎 Features & Architecture Highlights (v0.3.0 Neuron)
+## 💎 Features & Architecture Highlights (v0.4.0 Pulse)
 
-- **🚀 Sub-Millisecond Relational Engine:** Transitioned in Phase 3 from static flat JSON files to a pure-Go embedded SQLite graph database (`.codemri/graph.db`). Query dependencies and architectural bonds across 100k+ lines of code instantly.
-- **🛡️ 100% Local & Offline Privacy:** All parsing and graph structural indexing happens on your local CPU and Disk. Your proprietary code is never modified, uploaded to third-party servers, or exposed.
-- **🎨 Reactive Interactive Dashboard:** When you run `codemri` (or `codemri serve`), it spins up a local high-speed Fiber server on port 4000 and displays an ultra-premium dark-mode interactive dashboard directly in your browser.
+- **💓 Automated Repository Health Score & Debt Engine:** Phase 4 ("Pulse") algorithmically computes an overall repository letter grade (A+ to F), isolates uncalled dead code symbols, and exposes circular package dependencies instantly using `codemri analyze .`!
+- **🚀 Sub-Millisecond Relational Engine:** Powered by a pure-Go embedded SQLite graph database (`.codemri/graph.db`). Query dependencies and architectural bonds across 100k+ lines of code in sub-millisecond latencies.
+- **🛡️ 100% Local & Offline Privacy:** All parsing, graph indexing, and technical debt diagnostics run locally on your CPU and disk. Your proprietary code is never uploaded or exposed.
+- **🎨 Reactive Interactive Dashboard:** When you run `codemri`, it spins up a local high-speed Fiber server on port 4000 displaying live health scores, circular loop diagrams, and AI reasoning recommendations directly in your browser.
 - **🔍 Universal Deterministic Syntax Parser:** Built-in multi-language AST classification supporting Go, TypeScript, JavaScript, Python, Java, PHP, Rust, SQL, HTML, CSS, and Docker without external runtime SDKs.
 - **🩺 Environmental Health Diagnostics:** Verify your local machine readiness anytime with a single diagnostic run:
   ```bash
@@ -81,8 +82,8 @@ CodeMRI follows strict iterative engineering discipline where every release repr
 | **v0.1.0** | 🌟 **Genesis** | Monorepo architecture, CLI foundational engine, interface contracts | **✅ RELEASED** | [Read Spec](docs/phases/phase-01-genesis.md) |
 | **v0.2.0** | 🗺️ **Atlas** | High-speed concurrent worker pools, multi-language syntax AST parsing | **✅ RELEASED** | [Read Spec](docs/phases/phase-02-atlas.md) |
 | **v0.3.0** | 🧠 **Neuron** | CGO-free embedded SQLite relational graph indexing (`graph.db`), API querying | **✅ RELEASED** | [Read Spec](docs/phases/phase-03-neuron.md) |
-| **v0.4.0** | 💓 **Pulse** | Incremental Git history intelligence, technical debt & complexity algorithms | *In Progress* | — |
-| **v0.5.0** | 👁️ **Vision** | Interactive visual web canvas (Force-directed graph 2D/3D topology nodes) | *Planned* | — |
+| **v0.4.0** | 💓 **Pulse** | Dead code discovery, circular dependency loops, complexity & repository health scoring | **✅ RELEASED** | [Read Spec](docs/phases/phase-04-pulse.md) |
+| **v0.5.0** | 👁️ **Vision** | Interactive visual web canvas (Force-directed graph 2D/3D topology nodes) | *In Progress* | — |
 | **v0.6.0** | ⚡ **Cortex** | Offline & targeted AI reasoning endpoints over NRG nodes (Ollama/Claude/GPT) | *Planned* | — |
 | **v0.7.0** | 🛡️ **Shield** | Structural security intelligence (Secrets detection, dependency CVE verification) | *Planned* | — |
 | **v0.8.0** | 🚀 **Velocity** | Performance compilation insights & bundling bottleneck diagnostics | *Planned* | — |

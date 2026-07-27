@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/KangBasrengg/MRI-Code/internal/analyzer"
 	"github.com/KangBasrengg/MRI-Code/internal/graph"
 	"github.com/KangBasrengg/MRI-Code/internal/scanner"
 	"github.com/fatih/color"
@@ -125,7 +126,7 @@ var scanCmd = &cobra.Command{
 			Codename:       Codename,
 			ScannedRoot:    absPath,
 			Timestamp:      time.Now(),
-			Status:         "PHASE_03_NEURON_COMPLETE (SQLite NRG Indexed & Verified)",
+			Status:         "PHASE_04_PULSE_COMPLETE (SQLite NRG + Technical Debt Analytics Active)",
 			TotalFiles:     res.TotalFiles,
 			TotalBytes:     res.TotalBytes,
 			TotalLOC:       res.TotalLOC,
@@ -144,13 +145,20 @@ var scanCmd = &cobra.Command{
 			return
 		}
 
+		// Step 7: Perform Phase 4 Pulse Architectural Technical Debt & Health Eval
+		pulseReport := analyzer.Analyze(nrg, res.TotalLOC, res.TotalComments)
+		pulseBytes, _ := json.MarshalIndent(pulseReport, "", "  ")
+		pulsePath := filepath.Join(dotDir, "pulse.json")
+		_ = os.WriteFile(pulsePath, pulseBytes, 0644)
+
 		elapsed := time.Since(startTime)
 
 		// Print comprehensive analytical dashboard summary
 		fmt.Println("\n---------------------------------------------------------")
-		fmt.Printf("%s AST & Relational Indexing Completed in %v\n", green("✔ [SUCCESS]"), elapsed)
+		fmt.Printf("%s AST, SQLite Relational Engine & Pulse Analytics Completed in %v\n", green("✔ [SUCCESS]"), elapsed)
 		fmt.Printf("📂 Files Scanned : %s | 📄 LOC: %s | 💬 Comments: %d\n", yellow(fmt.Sprintf("%d", res.TotalFiles)), yellow(fmt.Sprintf("%d", res.TotalLOC)), res.TotalComments)
-		fmt.Printf("🧠 Compiled NRG  : %s Nodes | %s Relational Edges (SQLite Indexed)\n", magenta(fmt.Sprintf("%d", len(nrg.Nodes))), magenta(fmt.Sprintf("%d", len(nrg.Edges))))
+		fmt.Printf("🧠 Compiled NRG  : %s Nodes | %s Relational Edges\n", magenta(fmt.Sprintf("%d", len(nrg.Nodes))), magenta(fmt.Sprintf("%d", len(nrg.Edges))))
+		fmt.Printf("💓 Pulse Health  : %s/100 (Grade %s) | %s\n", green(fmt.Sprintf("%d", pulseReport.Health.OverallScore)), green(pulseReport.Health.Grade), color.New(color.FgCyan).SprintFunc()(pulseReport.Health.DebtStatus))
 		
 		if len(res.LanguageStats) > 0 {
 			fmt.Println("\n📊 Language Distribution:")

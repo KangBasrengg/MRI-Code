@@ -43,9 +43,10 @@ var serveCmd = &cobra.Command{
 		graphPath := filepath.Join(dotDir, "graph.json")
 
 		dbPath := filepath.Join(dotDir, "graph.db")
+		pulsePath := filepath.Join(dotDir, "pulse.json")
 
 		app := fiber.New(fiber.Config{
-			AppName:               "CodeMRI v0.3.0 (Neuron)",
+			AppName:               "CodeMRI v0.4.0 (Pulse)",
 			DisableStartupMessage: true,
 			ReadBufferSize:        65536,
 		})
@@ -62,9 +63,20 @@ var serveCmd = &cobra.Command{
 				"version":        Version,
 				"codename":       Codename,
 				"nrg_engine":     "NEURON_SQLITE_ONLINE",
-				"storage_engine": "Embedded SQLite Relational Index (.codemri/graph.db)",
+				"pulse_engine":   "PULSE_ANALYTICS_ONLINE",
+				"storage_engine": "Embedded SQLite Relational Index (.codemri/graph.db & pulse.json)",
 				"architecture":   "Single Source of Truth (ADR-0001)",
 			})
+		})
+
+		// ─── API: Pulse Analytics Diagnostics ───
+		app.Get("/api/pulse", func(c *fiber.Ctx) error {
+			data, err := os.ReadFile(pulsePath)
+			if err != nil {
+				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/pulse.json found. Run: codemri analyze ."})
+			}
+			c.Set("Content-Type", "application/json")
+			return c.Send(data)
 		})
 
 		// ─── API: Repository Metadata ───
