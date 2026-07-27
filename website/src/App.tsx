@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { CliInstallGuide } from './components/CliInstallGuide';
-import { TerminalDemo } from './components/TerminalDemo';
 import { HallOfFame } from './components/HallOfFame';
-import { DocsViewer } from './components/DocsViewer';
+import { GetStartedDocs } from './components/GetStartedDocs';
 import { BlogViewer } from './components/BlogViewer';
 import { Roadmap } from './components/Roadmap';
 import { Footer } from './components/Footer';
@@ -13,31 +10,16 @@ import type { ActiveTab } from './types';
 export function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
 
-  const handleOpenHallOfFame = () => {
-    setActiveTab('hall-of-fame');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleOpenDocs = () => {
-    setActiveTab('docs');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleScrollToCliInstall = () => {
-    if (activeTab !== 'home') {
-      setActiveTab('home');
-      setTimeout(() => {
-        const el = document.getElementById('cli-install-guide');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      const el = document.getElementById('cli-install-guide');
+    setActiveTab('home');
+    setTimeout(() => {
+      const el = document.getElementById('installation');
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       } else {
-        window.scrollTo({ top: 500, behavior: 'smooth' });
+        window.scrollTo({ top: 400, behavior: 'smooth' });
       }
-    }
+    }, 100);
   };
 
   return (
@@ -56,21 +38,7 @@ export function App() {
       {/* Dynamic Content Views */}
       <main className="flex-1 w-full bg-transparent">
         {activeTab === 'home' && (
-          <div className="space-y-6">
-            {/* 1. Impactful Hero Section */}
-            <Hero
-              onInstallClick={handleScrollToCliInstall}
-              onOpenHallOfFame={handleOpenHallOfFame}
-            />
-            
-            {/* 2. Official CLI Installation & Quickstart Section */}
-            <CliInstallGuide
-              onOpenFullDocs={handleOpenDocs}
-            />
-
-            {/* 3. 15-Second Interactive Terminal Simulation */}
-            <TerminalDemo />
-          </div>
+          <GetStartedDocs />
         )}
 
         {activeTab === 'hall-of-fame' && (
@@ -78,7 +46,7 @@ export function App() {
         )}
 
         {activeTab === 'docs' && (
-          <DocsViewer />
+          <GetStartedDocs />
         )}
 
         {activeTab === 'roadmap' && (

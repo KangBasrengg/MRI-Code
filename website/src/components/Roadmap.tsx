@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, Zap, Cpu, Cloud, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, Cloud } from 'lucide-react';
 
 export const Roadmap: React.FC = () => {
   const roadmapVersions = [

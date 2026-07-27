@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { ActiveTab } from '../types';
-import { Brain, BookOpen, Star, Sparkles, Map, Cpu, Newspaper, Terminal, Menu, X } from 'lucide-react';
+import { Brain, BookOpen, Star, Sparkles, Map, Newspaper, Terminal, Menu, X } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -12,9 +12,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onInsta
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems: { id: ActiveTab; label: string; icon: React.ReactNode; badge?: string }[] = [
-    { id: 'home', label: 'Overview', icon: <Cpu className="w-4 h-4 text-cyan-400" /> },
+    { id: 'home', label: 'Get Started & Guide', icon: <BookOpen className="w-4 h-4 text-cyan-400" /> },
     { id: 'hall-of-fame', label: 'Hall of Fame', icon: <Sparkles className="w-4 h-4 text-amber-400" />, badge: 'Viral' },
-    { id: 'docs', label: 'Docs & CLI Guide', icon: <BookOpen className="w-4 h-4 text-blue-400" /> },
     { id: 'roadmap', label: 'Roadmap', icon: <Map className="w-4 h-4 text-emerald-400" /> },
     { id: 'blog', label: 'Blog', icon: <Newspaper className="w-4 h-4 text-purple-400" /> },
   ];
