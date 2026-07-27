@@ -9,6 +9,8 @@
 [![Engine: Full Spectrum](https://img.shields.io/badge/Engine-Full__Spectrum__Intelligence-6366F1?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/release_notes/v1.0.0-mri.md)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25__Offline__CPU-3B82F6?style=for-the-badge&logo=security&logoColor=white&labelColor=080b12)](docs/philosophy.md)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F59E0B.svg?style=for-the-badge&labelColor=080b12)](https://opensource.org/licenses/Apache-2.0)
+[![Support & Donate: Saweria](https://img.shields.io/badge/Support-Saweria%20Donation-FFB600?style=for-the-badge&logo=ko-fi&logoColor=black&labelColor=080b12)](https://saweria.co/Hoodtech)
+
 
 <br>
 
@@ -112,7 +114,22 @@ CodeMRI is licensed under the commercial-friendly **Apache 2.0 License**, guaran
 3. Check the [Pull Request Guidelines](.github/pull_request_template.md).
 4. Fork the repository, build from source with `make build` or `go test ./...`, and submit your PR!
 
+---
+
+## 💖 Sponsor & Support the Project
+
+CodeMRI is engineered with intense dedication, thousands of lines of CGO-free performance discipline, and an unconditional commitment to developers worldwide. If this tool saves your engineering team time, simplifies complex codebase analysis, or enhances your architecture workflows, please consider showing your appreciation to **Muhammad Nuril (KangBasrengg)** via Saweria:
+
 <div align="center">
   <br>
+  <a href="https://saweria.co/Hoodtech">
+    <img src="https://img.shields.io/badge/☕_Dukung_&_Donasi_via-Saweria.co%2FHoodtech-FFC800?style=for-the-badge&logo=buymeacoffee&logoColor=black&labelColor=111827" alt="Support & Donate on Saweria" height="44">
+  </a>
+  <br><br>
+  <i>Every contribution directly catalyzes future open-source innovation, new structural AI enhancements, and ongoing project maintenance. Thank you deeply for your support! ❤️</i>
+</div>
+
+<div align="center">
+  <br><hr><br>
   Made with passion and zero-dependency discipline by <b>Muhammad Nuril (KangBasrengg)</b> and the CodeMRI Open Source Community.
 </div>
