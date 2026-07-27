@@ -53,7 +53,7 @@ var doctorCmd = &cobra.Command{
 				allPassed = false
 			} else {
 				sqliteStore.Close()
-				fmt.Printf("✔ SQLite Relational & Pulse Engine (v0.4.0): %s (CGO-free embedded graph & technical debt intelligence active)\n", green("ONLINE"))
+				fmt.Printf("✔ SQLite Relational & Full-Spectrum Engine (v1.0.0 MRI): %s (CGO-free embedded graph & intelligence active)\n", green("ONLINE"))
 			}
 
 			_ = os.RemoveAll(testDir)
@@ -72,7 +72,7 @@ var doctorCmd = &cobra.Command{
 
 		fmt.Println("──────────────────────────────────────────────────────────────────────────")
 		if allPassed {
-			fmt.Println(green("🎉 All diagnostic tests passed! CodeMRI Pulse engine (v0.4.0) is 100% operational."))
+			fmt.Println(green("🎉 All diagnostic tests passed! CodeMRI intelligence engine (v1.0.0 MRI) is 100% operational."))
 		} else {
 			fmt.Println(color.YellowString("⚠️ Some diagnostic tests raised warnings. See details above."))
 		}

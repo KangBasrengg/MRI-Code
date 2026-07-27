@@ -27,7 +27,7 @@ export const Hero: React.FC<HeroProps> = ({ onInstallClick, onOpenHallOfFame }) 
         {/* Release Badge */}
         <button onClick={() => {}} className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-black/60 border border-cyan-500/40 text-xs text-cyan-300 font-mono font-extrabold mb-8 shadow-xl hover:border-cyan-400 transition-all cursor-pointer backdrop-blur-md group">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping mr-2" />
-          <span>v0.5.0 Vision Released — Interactive Force-Directed Topology Canvas Online 🕸️</span>
+          <span>v1.0.0 MRI Released — Full-Spectrum Intelligence, AI Reasoning & Security Online 🎉</span>
           <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
         </button>
 

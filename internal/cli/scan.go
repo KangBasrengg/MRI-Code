@@ -55,7 +55,7 @@ var scanCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("%s Starting Phase 04 Pulse Repository Scan on: %s\n", cyan("📡 [CodeMRI]"), yellow(absPath))
+		fmt.Printf("%s Starting CodeMRI v1.0.0 (MRI) Repository Intelligence Scan on: %s\n", cyan("📡 [CodeMRI]"), yellow(absPath))
 		fmt.Println("⚡ Running syntax parsers & indexing SQLite relational graph...")
 		
 		startTime := time.Now()
@@ -126,7 +126,7 @@ var scanCmd = &cobra.Command{
 			Codename:       Codename,
 			ScannedRoot:    absPath,
 			Timestamp:      time.Now(),
-			Status:         "PHASE_04_PULSE_COMPLETE (SQLite NRG + Technical Debt Analytics Active)",
+			Status:         "V1_0_0_MRI_COMPLETE (SQLite NRG + Technical Debt & Intelligence Engine Active)",
 			TotalFiles:     res.TotalFiles,
 			TotalBytes:     res.TotalBytes,
 			TotalLOC:       res.TotalLOC,

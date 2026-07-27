@@ -36,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onInsta
               Code<span className="text-cyan-400"></span>MRI
             </span>
             <span className="text-[10px] uppercase font-mono px-2 py-0.5 bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-bold rounded-full whitespace-nowrap hidden sm:inline-block shadow-sm">
-              v0.5.0
+              v1.0.0
             </span>
           </div>
         </div>

@@ -49,7 +49,25 @@ export const Roadmap: React.FC = () => {
       badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
     },
     {
-      ver: "v1.0.0+",
+      ver: "v0.6.0 – v0.9.0",
+      code: "Cortex, Shield, Velocity & Forge",
+      title: "AI Reasoning, Security, Performance & Plugin Foundation",
+      status: "COMPLETED",
+      items: ["Offline-first natural language architectural querying (codemri explain)", "Hardcoded secret & SQLi/XSS vulnerability detection (Shield)", "Bundle size, large module & heavy import bottleneck warnings (Velocity)", "Universal terminal query commands & plugin JSON APIs (Forge)"],
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-400" />,
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+    },
+    {
+      ver: "v1.0.0",
+      code: "MRI (Stable Worldwide Release)",
+      title: "Full-Spectrum Neural Repository Intelligence Engine",
+      status: "COMPLETED",
+      items: ["Production enterprise reliability across Windows, macOS & Linux", "Zero cloud transmission local privacy architecture (ADR-0002)", "One-word execution muscle memory (codemri)", "Complete suite of 8 diagnostic & exploration CLI commands"],
+      icon: <CheckCircle2 className="w-6 h-6 text-emerald-400" />,
+      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+    },
+    {
+      ver: "v2.0.0+",
       code: "Cloud & Enterprise Ecosystem",
       title: "Team Workspaces & Automated PR Reviews",
       status: "FUTURE ECOSYSTEM",

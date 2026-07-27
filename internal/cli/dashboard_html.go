@@ -7,7 +7,7 @@ const dashboardHTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeMRI Dashboard — Neural Repository Intelligence (Vision v0.5.0)</title>
+    <title>CodeMRI Dashboard — Neural Repository Intelligence (MRI v1.0.0)</title>
     <style>
         :root {
             --bg-base: #080b12;
@@ -233,10 +233,10 @@ const dashboardHTML = `<!DOCTYPE html>
                 <p>Offline-First Neural Repository Intelligence Platform</p>
             </div>
             <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
-                <span class="storage-pill" id="storage-engine-badge">SQLite Relational & Vision Canvas Engine</span>
+                <span class="storage-pill" id="storage-engine-badge">SQLite Relational & Full-Spectrum Intelligence Engine</span>
                 <div class="status-badge">
                     <span class="pulse"></span>
-                    <span id="engine-status">VISION v0.5.0 ACTIVE</span>
+                    <span id="engine-status">MRI v1.0.0 ACTIVE</span>
                 </div>
             </div>
         </header>
@@ -358,7 +358,7 @@ const dashboardHTML = `<!DOCTYPE html>
         </div>
 
         <footer>
-            CodeMRI v0.5.0 (Vision) • Licensed under Apache 2.0 for Enterprise Patent Security • Built with ❤️ by Muhammad Nuril
+            CodeMRI v1.0.0 (MRI) • Licensed under Apache 2.0 for Enterprise Patent Security • Built with ❤️ by Muhammad Nuril
         </footer>
     </div>
 

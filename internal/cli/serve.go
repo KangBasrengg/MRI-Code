@@ -45,8 +45,11 @@ var serveCmd = &cobra.Command{
 		dbPath := filepath.Join(dotDir, "graph.db")
 		pulsePath := filepath.Join(dotDir, "pulse.json")
 
+		secPath := filepath.Join(dotDir, "security.json")
+		perfPath := filepath.Join(dotDir, "performance.json")
+
 		app := fiber.New(fiber.Config{
-			AppName:               "CodeMRI v0.4.0 (Pulse)",
+			AppName:               "CodeMRI v1.0.0 (MRI)",
 			DisableStartupMessage: true,
 			ReadBufferSize:        65536,
 		})
@@ -59,13 +62,16 @@ var serveCmd = &cobra.Command{
 		// ─── API: System Status ───
 		app.Get("/api/status", func(c *fiber.Ctx) error {
 			return c.JSON(fiber.Map{
-				"platform":       "CodeMRI Repository Intelligence Platform",
-				"version":        Version,
-				"codename":       Codename,
-				"nrg_engine":     "NEURON_SQLITE_ONLINE",
-				"pulse_engine":   "PULSE_ANALYTICS_ONLINE",
-				"storage_engine": "Embedded SQLite Relational Index (.codemri/graph.db & pulse.json)",
-				"architecture":   "Single Source of Truth (ADR-0001)",
+				"platform":        "CodeMRI Repository Intelligence Platform",
+				"version":         Version,
+				"codename":        Codename,
+				"nrg_engine":      "NEURON_SQLITE_ONLINE",
+				"pulse_engine":    "PULSE_ANALYTICS_ONLINE",
+				"cortex_engine":   "CORTEX_REASONING_ONLINE",
+				"shield_engine":   "SHIELD_SECURITY_ONLINE",
+				"velocity_engine": "VELOCITY_PERFORMANCE_ONLINE",
+				"storage_engine":  "Embedded SQLite Relational Index (.codemri/)",
+				"architecture":    "Single Source of Truth (ADR-0001 & ADR-0002)",
 			})
 		})
 
@@ -74,6 +80,26 @@ var serveCmd = &cobra.Command{
 			data, err := os.ReadFile(pulsePath)
 			if err != nil {
 				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/pulse.json found. Run: codemri analyze ."})
+			}
+			c.Set("Content-Type", "application/json")
+			return c.Send(data)
+		})
+
+		// ─── API: Shield Security Diagnostics ───
+		app.Get("/api/security", func(c *fiber.Ctx) error {
+			data, err := os.ReadFile(secPath)
+			if err != nil {
+				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/security.json found. Run: codemri analyze ."})
+			}
+			c.Set("Content-Type", "application/json")
+			return c.Send(data)
+		})
+
+		// ─── API: Velocity Performance Diagnostics ───
+		app.Get("/api/performance", func(c *fiber.Ctx) error {
+			data, err := os.ReadFile(perfPath)
+			if err != nil {
+				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/performance.json found. Run: codemri analyze ."})
 			}
 			c.Set("Content-Type", "application/json")
 			return c.Send(data)
