@@ -61,19 +61,21 @@ codemri
 
 ---
 
-## 💎 Features & Architecture Highlights (v0.5.0 Vision)
+## 💎 Features & Architecture Highlights (v1.0.0 MRI Enterprise Release)
 
-- **🕸️ Interactive Force-Directed Topology Canvas:** Phase 5 ("Vision") introduces a 60FPS physics-driven graph visualization at `localhost:4000`. Click any symbol node to instantly calculate its architectural impact radius, upstream dependents, and downstream dependencies.
-- **💓 Automated Repository Health Score & Debt Engine:** Algorithmically computes an overall repository letter grade (A+ to F), isolates uncalled dead code symbols, and exposes circular package dependencies instantly using `codemri analyze .`!
-- **🚀 Sub-Millisecond Relational Engine:** Powered by a pure-Go embedded SQLite graph database (`.codemri/graph.db`). Query dependencies and architectural bonds across 100k+ lines of code in sub-millisecond latencies.
-- **🛡️ 100% Local & Offline Privacy:** All parsing, graph indexing, topology rendering, and technical debt diagnostics run locally on your CPU and disk. Your proprietary code is never uploaded or exposed.
-- **🎨 Reactive Interactive Dashboard:** When you run `codemri`, it spins up a local high-speed Fiber server on port 4000 displaying live health scores, force-directed topology canvas, and AI reasoning recommendations directly in your browser.
-- **🔍 Universal Deterministic Syntax Parser:** Built-in multi-language AST classification supporting Go, TypeScript, JavaScript, Python, Java, PHP, Rust, SQL, HTML, CSS, and Docker without external runtime SDKs.
-- **🩺 Environmental Health Diagnostics:** Verify your local machine readiness anytime with a single diagnostic run:
+- **🤖 Cortex AI Copilot (Offline vs. Online AI Mode):** Ask natural language questions about your repository structure using `codemri explain` or via the persistent **Floating Chat Bubble** inside the analyzer web UI.
+  - **🌐 Online AI Model Enrichment (`--online`):** Natively integrates with `freemodel.dev` API models to provide deep conversational architectural analysis enriched by local graph structural context.
+  - **🔒 Strict Zero-Cloud Privacy Lock (`--offline`):** Enforced local processing with `codemri --offline`. Disables all cloud transmissions and computes answers exclusively over local SQLite structural topology (ADR-0002 compliant).
+- **🕸️ Interactive Force-Directed Topology Canvas:** Introduces a 60FPS physics-driven graph visualization at `localhost:4000`. Click any symbol node to instantly compute its architectural impact radius, upstream callers, and downstream dependencies.
+- **💓 Pulse — Tech Debt & Health Scoring:** Algorithmically computes an overall repository letter grade (A+ to F), isolates uncalled dead code symbols, and exposes circular package import chains instantly using `codemri analyze .`.
+- **🛡️ Shield — Security & Secret Diagnostics:** Multi-layered security intelligence scanning for hardcoded API keys, JWTs, XSS vulnerabilities (`innerHTML`), SQL injections, and dependency risks with actionable remediation advice.
+- **🚀 Velocity — Performance & Footprint Profiling:** Identifies packaging compilation bottlenecks, bloated source files (>50KB), heavy standard library dependency chains, and optimization targets.
+- **💾 Sub-Millisecond Relational SQLite Engine:** Powered by a pure-Go embedded SQLite graph database (`.codemri/graph.db`). Query dependencies and architectural bonds across 100k+ lines of code in sub-millisecond latencies.
+- **🔍 Universal Deterministic Syntax Parser:** Multi-language AST classification supporting Go, TypeScript, JavaScript, Python, Java, PHP, Rust, SQL, HTML, CSS, and Docker without external runtime SDKs.
+- **🩺 Environmental Diagnostics & Port Guard:** Verify system readiness anytime with a single diagnostic run:
   ```bash
   codemri doctor
   ```
-
 ---
 
 ## 🗺️ Engineering Roadmap & Release Progress

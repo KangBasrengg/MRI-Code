@@ -22,6 +22,9 @@ import (
 // DefaultFreemodelAPIKey is the API key provided for freemodel.dev integrations.
 const DefaultFreemodelAPIKey = "fe_oa_a86d249e95f7de55374c22071a87f4f62b71326084202490"
 
+// OfflineMode enforces strict local structural reasoning and disables outbound cloud AI connections.
+var OfflineMode bool
+
 // ChatResponse represents the conversational output sent back to the interactive Web Analyzer UI or CLI.
 type ChatResponse struct {
 	Reply       string          `json:"reply"`
@@ -153,20 +156,22 @@ func GenerateChatReply(repoPath string, question string) (*ChatResponse, error) 
 
 	userPrompt := fmt.Sprintf("Repository Context:\n%s\n\nUser Question:\n%s", promptContext.String(), question)
 
-	// Attempt integration with Freemodel.dev AI
-	apiKey := os.Getenv("CODEMRI_API_KEY")
-	if apiKey == "" {
-		apiKey = DefaultFreemodelAPIKey
-	}
+	// Attempt integration with Freemodel.dev AI unless strict offline mode is enabled
+	if !OfflineMode && os.Getenv("CODEMRI_OFFLINE") != "1" && os.Getenv("CODEMRI_OFFLINE") != "true" {
+		apiKey := os.Getenv("CODEMRI_API_KEY")
+		if apiKey == "" {
+			apiKey = DefaultFreemodelAPIKey
+		}
 
-	aiReply, aiErr := CallFreemodelAI(apiKey, systemPrompt, userPrompt)
-	if aiErr == nil && len(strings.TrimSpace(aiReply)) > 10 {
-		return &ChatResponse{
-			Reply:       aiReply,
-			Symbols:     symbols,
-			HealthScore: healthScore,
-			Engine:      "Cortex + Freemodel.dev AI (Online Intelligence)",
-		}, nil
+		aiReply, aiErr := CallFreemodelAI(apiKey, systemPrompt, userPrompt)
+		if aiErr == nil && len(strings.TrimSpace(aiReply)) > 10 {
+			return &ChatResponse{
+				Reply:       aiReply,
+				Symbols:     symbols,
+				HealthScore: healthScore,
+				Engine:      "Cortex + Freemodel.dev AI (Online Intelligence)",
+			}, nil
+		}
 	}
 
 	// Graceful Fallback: Local Structural Synthesis (Offline-First)
@@ -205,11 +210,16 @@ func GenerateChatReply(repoPath string, question string) (*ChatResponse, error) 
 	}
 	fallbackReply.WriteString("\n\n*🛡️ Offline Fallback Mode Active (ADR-0002): Computed locally via SQLite NRG structural traversal.*")
 
+	engineTitle := "Cortex v1.0.0 Structural AI (Local Offline Fallback)"
+	if OfflineMode || os.Getenv("CODEMRI_OFFLINE") == "1" || os.Getenv("CODEMRI_OFFLINE") == "true" {
+		engineTitle = "Cortex v1.0.0 Structural AI (Strict Offline Mode - ADR-0002)"
+	}
+
 	return &ChatResponse{
 		Reply:       fallbackReply.String(),
 		Symbols:     symbols,
 		HealthScore: healthScore,
-		Engine:      "Cortex v1.0.0 Structural AI (Local Offline Fallback)",
+		Engine:      engineTitle,
 	}, nil
 }
 

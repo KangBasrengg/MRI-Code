@@ -419,14 +419,51 @@ export const GetStartedDocs = () => {
             {/* Example 3: AI Chatbot Usage */}
             <div id="usage-ai" className="p-6 rounded-2xl bg-slate-900/50 border border-blue-500/30 space-y-4">
               <h3 className="font-bold text-white text-lg flex items-center gap-2">
-                🤖 3. Interactive AI Chatbot (Web &amp; CLI)
+                🤖 3. Interactive AI Chatbot &amp; Floating Copilot Bubble
               </h3>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Once a repository is scanned, you can ask architectural questions in plain natural language. In the browser dashboard (<code className="text-blue-300">localhost:4000</code>), use the built-in Cortex AI console at the bottom of the screen. In the terminal, execute the <code className="text-cyan-300">explain</code> subcommand:
+                Once a repository is scanned, you can ask architectural questions in plain natural language. In the browser dashboard (<code className="text-blue-300">localhost:4000</code>), click the persistent <strong className="text-cyan-400">🤖 Ask Cortex AI</strong> floating chat bubble at the bottom-right corner or use the inline console. In the terminal, execute the <code className="text-cyan-300">explain</code> subcommand:
               </p>
               <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs sm:text-sm text-slate-300 flex justify-between items-center">
                 <span>$ codemri explain <strong className="text-amber-300">"What are the main functions in the authentication module?"</strong></span>
                 <button onClick={() => copyToClipboard('codemri explain "What are the main functions in the authentication module?"')} className="text-slate-500 hover:text-white"><Copy className="w-4 h-4" /></button>
+              </div>
+            </div>
+
+            {/* Example 4: Offline vs Online AI Modes */}
+            <div id="usage-modes" className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/30 via-slate-900/90 to-teal-950/30 border border-teal-500/40 space-y-4 shadow-xl">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h3 className="font-bold text-teal-300 text-lg flex items-center gap-2">
+                  🔒 4. Strict Offline vs. 🌐 Online AI Modes
+                </h3>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-teal-500/20 text-teal-300 font-extrabold">NEW in v1.0.0</span>
+              </div>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                CodeMRI gives developers total control over AI inference and network privacy. You can explicitly switch between high-security air-gapped execution and cloud AI enrichment:
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4 pt-2">
+                <div className="p-4 rounded-xl bg-slate-950/90 border border-emerald-500/30 space-y-2">
+                  <div className="text-emerald-400 font-bold font-mono text-xs sm:text-sm flex items-center gap-2">
+                    <span>🔒 Strict Offline Mode (`--offline`)</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Enforces zero cloud transmissions (ADR-0002 compliance). Cortex AI runs exclusively over local SQLite NRG structural topology without internet connection.
+                  </p>
+                  <div className="font-mono text-xs text-slate-300 bg-slate-900 p-2 rounded border border-slate-800">
+                    $ codemri --offline
+                  </div>
+                </div>
+                <div className="p-4 rounded-xl bg-slate-950/90 border border-sky-500/30 space-y-2">
+                  <div className="text-sky-400 font-bold font-mono text-xs sm:text-sm flex items-center gap-2">
+                    <span>🌐 Online AI Mode (`--online`)</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Enables conversational enrichment via <code className="text-cyan-300 font-mono">freemodel.dev</code> cloud intelligence models combined with your local repository structural context.
+                  </p>
+                  <div className="font-mono text-xs text-slate-300 bg-slate-900 p-2 rounded border border-slate-800">
+                    $ codemri --online
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -477,6 +514,16 @@ export const GetStartedDocs = () => {
                       <td className="py-3 px-5 font-mono font-bold text-pink-400">codemri doctor</td>
                       <td className="py-3 px-5 font-mono text-xs text-slate-500">None</td>
                       <td className="py-3 px-5">Verify local Go environment, filesystem read/write capability, SQLite bindings, and network port availability.</td>
+                    </tr>
+                    <tr className="hover:bg-slate-900/40 transition-colors">
+                      <td className="py-3 px-5 font-mono font-bold text-teal-400">codemri --offline</td>
+                      <td className="py-3 px-5 font-mono text-xs text-teal-300">[any command]</td>
+                      <td className="py-3 px-5">Strict Zero-Cloud Privacy Lock (ADR-0002). Disables cloud connections and runs Cortex AI using pure local SQLite structural topology.</td>
+                    </tr>
+                    <tr className="hover:bg-slate-900/40 transition-colors">
+                      <td className="py-3 px-5 font-mono font-bold text-sky-400">codemri --online</td>
+                      <td className="py-3 px-5 font-mono text-xs text-sky-300">[any command]</td>
+                      <td className="py-3 px-5">Explicitly enable online AI model enrichment via <code className="text-cyan-400 font-mono">freemodel.dev</code> cloud intelligence combined with local NRG context.</td>
                     </tr>
                   </tbody>
                 </table>

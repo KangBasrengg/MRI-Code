@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/KangBasrengg/MRI-Code/internal/cortex"
 	"github.com/KangBasrengg/MRI-Code/internal/remote"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -15,6 +16,10 @@ import (
 var (
 	// Verbose toggles detailed debugging output across CLI commands.
 	Verbose bool
+	// OfflineFlag enforces strict zero-network privacy mode (ADR-0002 compliance).
+	OfflineFlag bool
+	// OnlineFlag enables cloud AI enrichment via freemodel.dev models.
+	OnlineFlag bool
 )
 
 var rootCmd = &cobra.Command{
@@ -28,6 +33,15 @@ var rootCmd = &cobra.Command{
 	SilenceErrors: true,
 	SilenceUsage:  true,
 	Args:          cobra.MaximumNArgs(1),
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if OfflineFlag || os.Getenv("CODEMRI_OFFLINE") == "1" || os.Getenv("CODEMRI_OFFLINE") == "true" {
+			cortex.OfflineMode = true
+			color.New(color.FgCyan, color.Bold).Println("🔒 [MODE: STRICT OFFLINE] Zero-cloud transmission policy active (ADR-0002 enforced).")
+		} else if OnlineFlag {
+			cortex.OfflineMode = false
+			color.New(color.FgGreen, color.Bold).Println("🌐 [MODE: ONLINE AI ENRICHMENT] Connected to freemodel.dev artificial intelligence models.")
+		}
+	},
 	// Killer Feature: Running `codemri` directly without args (or with `.`) auto-scans and serves UI!
 	Run: func(cmd *cobra.Command, args []string) {
 		cyan := color.New(color.FgCyan, color.Bold).SprintFunc()
@@ -83,6 +97,8 @@ func Execute() error {
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Enable detailed verbose debugging logs")
+	rootCmd.PersistentFlags().BoolVar(&OfflineFlag, "offline", false, "Strict offline privacy lock (disable cloud AI and remote Git fetch)")
+	rootCmd.PersistentFlags().BoolVar(&OnlineFlag, "online", false, "Enable online AI model enrichment via freemodel.dev")
 
 	// Register subcommands
 	rootCmd.AddCommand(versionCmd)
