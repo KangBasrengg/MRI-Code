@@ -5,8 +5,8 @@
 
 *"GitHub shows your syntax and file lists. CodeMRI reveals how your software actually thinks and executes."*
 
-[![Version](https://img.shields.io/badge/Release-v0.5.0__Vision-6366F1?style=for-the-badge&logo=go&logoColor=white&labelColor=080b12)](https://github.com/KangBasrengg/MRI-Code/releases)
-[![Engine: Vision & SQLite](https://img.shields.io/badge/Engine-Vision__Topology__Canvas-10B981?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/phases/phase-05-vision.md)
+[![Version](https://img.shields.io/badge/Release-v1.0.0__MRI-10B981?style=for-the-badge&logo=go&logoColor=white&labelColor=080b12)](https://github.com/KangBasrengg/MRI-Code/releases)
+[![Engine: Full Spectrum](https://img.shields.io/badge/Engine-Full__Spectrum__Intelligence-6366F1?style=for-the-badge&logo=sqlite&logoColor=white&labelColor=080b12)](docs/release_notes/v1.0.0-mri.md)
 [![Privacy: 100% Offline](https://img.shields.io/badge/Privacy-100%25__Offline__CPU-3B82F6?style=for-the-badge&logo=security&logoColor=white&labelColor=080b12)](docs/philosophy.md)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F59E0B.svg?style=for-the-badge&labelColor=080b12)](https://opensource.org/licenses/Apache-2.0)
 
@@ -85,11 +85,11 @@ CodeMRI follows strict iterative engineering discipline where every release repr
 | **v0.3.0** | 🧠 **Neuron** | CGO-free embedded SQLite relational graph indexing (`graph.db`), API querying | **✅ RELEASED** | [Read Spec](docs/phases/phase-03-neuron.md) |
 | **v0.4.0** | 💓 **Pulse** | Dead code discovery, circular dependency loops, complexity & repository health scoring | **✅ RELEASED** | [Read Spec](docs/phases/phase-04-pulse.md) |
 | **v0.5.0** | 👁️ **Vision** | Interactive force-directed topology canvas & instant impact analysis engine | **✅ RELEASED** | [Read Spec](docs/phases/phase-05-vision.md) |
-| **v0.6.0** | ⚡ **Cortex** | Offline & targeted AI reasoning endpoints over NRG nodes (Ollama/Claude/GPT) | *Planned* | — |
-| **v0.7.0** | 🛡️ **Shield** | Structural security intelligence (Secrets detection, dependency CVE verification) | *Planned* | — |
-| **v0.8.0** | 🚀 **Velocity** | Performance compilation insights & bundling bottleneck diagnostics | *Planned* | — |
-| **v0.9.0** | 🔨 **Forge** | Extensible plugin marketplace & universal community SDK | *Planned* | — |
-| **v1.0.0** | 🎉 **MRI** | Stable worldwide production enterprise release | *Target Goal* | — |
+| **v0.6.0** | ⚡ **Cortex** | Offline AI reasoning engine — `codemri explain` natural language queries | **✅ RELEASED** | [Read Spec](docs/phases/phase-06-cortex.md) |
+| **v0.7.0** | 🛡️ **Shield** | Security intelligence — secrets detection, SQLi/XSS/CSRF scanning | **✅ RELEASED** | [Read Spec](docs/phases/phase-07-shield.md) |
+| **v0.8.0** | 🚀 **Velocity** | Performance intelligence — large files, heavy imports, duplicate packages | **✅ RELEASED** | [Read Spec](docs/phases/phase-08-velocity.md) |
+| **v0.9.0** | 🔨 **Forge** | Plugin extensibility foundation — terminal graph queries, JSON API contracts | **✅ RELEASED** | [Read Spec](docs/phases/phase-09-forge.md) |
+| **v1.0.0** | 🎉 **MRI** | Stable worldwide production enterprise release | **🌟 STABLE RELEASE** | [Read Spec](docs/release_notes/v1.0.0-mri.md) |
 
 ---
 

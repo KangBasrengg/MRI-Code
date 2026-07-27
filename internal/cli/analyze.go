@@ -8,6 +8,8 @@ import (
 
 	"github.com/KangBasrengg/MRI-Code/internal/analyzer"
 	"github.com/KangBasrengg/MRI-Code/internal/graph"
+	"github.com/KangBasrengg/MRI-Code/internal/performance"
+	"github.com/KangBasrengg/MRI-Code/internal/security"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -135,10 +137,86 @@ var analyzeCmd = &cobra.Command{
 		for _, sugg := range report.Health.Suggestions {
 			fmt.Printf("   👉 %s\n", sugg)
 		}
+
+		// ── Phase 7 Shield: Security Intelligence ──
+		fmt.Println("\n🛡️ [SHIELD — SECURITY INTELLIGENCE SCAN]")
+		fmt.Println("---------------------------------------------------------")
+		secReport, secErr := security.RunSecurityScan(absRoot)
+		if secErr != nil {
+			fmt.Printf("   ⚠ Security scan error: %v\n", secErr)
+		} else {
+			secPath := filepath.Join(codemriDir, "security.json")
+			security.SaveReport(secReport, secPath)
+			gradeColor := green
+			if secReport.Critical > 0 || secReport.High > 3 {
+				gradeColor = red
+			} else if secReport.High > 0 || secReport.Medium > 3 {
+				gradeColor = yellow
+			}
+			fmt.Printf("   📊 Security Grade: %s\n", gradeColor(secReport.SecurityGrade))
+			fmt.Printf("   🔍 Files Scanned: %d | Findings: %d\n", secReport.TotalFiles, secReport.TotalFindings)
+			if secReport.Critical > 0 {
+				fmt.Printf("   🚨 Critical: %s\n", red(fmt.Sprintf("%d", secReport.Critical)))
+			}
+			if secReport.High > 0 {
+				fmt.Printf("   ⚠️  High:     %s\n", yellow(fmt.Sprintf("%d", secReport.High)))
+			}
+			if secReport.Medium > 0 {
+				fmt.Printf("   ℹ️  Medium:   %d\n", secReport.Medium)
+			}
+			if secReport.TotalFindings == 0 {
+				fmt.Printf("   ✔ %s\n", green("No security vulnerabilities detected. Excellent!"))
+			} else {
+				limit := 3
+				for i, f := range secReport.Findings {
+					if i >= limit {
+						fmt.Printf("   ... and %d more in %s\n", secReport.TotalFindings-limit, yellow("security.json"))
+						break
+					}
+					fmt.Printf("   • [%s] %s — %s:%d\n", red(string(f.Severity)), f.Description, f.FilePath, f.LineNumber)
+				}
+			}
+			fmt.Printf("   📂 Full report saved to: %s\n", cyan(".codemri/security.json"))
+		}
+
+		// ── Phase 8 Velocity: Performance Intelligence ──
+		fmt.Println("\n🚀 [VELOCITY — PERFORMANCE INTELLIGENCE SCAN]")
+		fmt.Println("---------------------------------------------------------")
+		perfReport, perfErr := performance.RunPerformanceScan(absRoot)
+		if perfErr != nil {
+			fmt.Printf("   ⚠ Performance scan error: %v\n", perfErr)
+		} else {
+			perfPath := filepath.Join(codemriDir, "performance.json")
+			performance.SaveReport(perfReport, perfPath)
+			fmt.Printf("   📊 Performance Grade: %s\n", green(perfReport.PerformanceGrade))
+			fmt.Printf("   📦 Total Source Size: %s across %d files\n", yellow(humanizeBytes(perfReport.TotalSizeBytes)), perfReport.TotalFiles)
+			if len(perfReport.LargeFiles) > 0 {
+				fmt.Printf("   📏 Large Files: %d files exceed 50KB\n", len(perfReport.LargeFiles))
+			}
+			if len(perfReport.HeavyImports) > 0 {
+				fmt.Printf("   📥 Heavy Imports: %d files with >15 imports\n", len(perfReport.HeavyImports))
+			}
+			for _, s := range perfReport.Suggestions {
+				fmt.Printf("   💡 %s\n", s)
+			}
+			fmt.Printf("   📂 Full report saved to: %s\n", cyan(".codemri/performance.json"))
+		}
+
 		fmt.Println("\n=====================================================================")
-		fmt.Printf("📂 Comprehensive Pulse analysis report saved to: %s\n", cyan(".codemri/pulse.json"))
+		fmt.Printf("📂 All analysis reports saved to: %s\n", cyan(".codemri/"))
 		return nil
 	},
+}
+
+func humanizeBytes(b int64) string {
+	switch {
+	case b >= 1024*1024:
+		return fmt.Sprintf("%.1f MB", float64(b)/(1024*1024))
+	case b >= 1024:
+		return fmt.Sprintf("%.1f KB", float64(b)/1024)
+	default:
+		return fmt.Sprintf("%d B", b)
+	}
 }
 
 func init() {
