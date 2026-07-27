@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { ActiveTab } from '../types';
-import { Brain, BookOpen, Star, Sparkles, Map, Newspaper, Terminal, Menu, X } from 'lucide-react';
+import { BookOpen, Star, Sparkles, Map, Newspaper, Terminal, Menu, X } from 'lucide-react';
+import codemriLogo from '../assets/codemri.png';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -27,8 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onInsta
           onClick={() => setActiveTab('home')}
           className="flex items-center space-x-3 cursor-pointer group flex-shrink-0"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 via-blue-600/30 to-purple-600/30 border border-cyan-500/40 flex items-center justify-center shadow-md group-hover:border-cyan-400 transition-all">
-            <Brain className="w-5 h-5 text-cyan-400 animate-pulse-slow" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 via-blue-600/30 to-purple-600/30 border border-cyan-500/40 flex items-center justify-center shadow-md group-hover:border-cyan-400 transition-all p-1">
+            <img src={codemriLogo} alt="CodeMRI Logo" className="w-full h-full object-contain filter drop-shadow" />
           </div>
           <div className="flex items-center space-x-2.5">
             <span className="font-sans font-black text-lg sm:text-xl tracking-tight text-white whitespace-nowrap">
