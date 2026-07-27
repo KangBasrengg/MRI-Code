@@ -11,6 +11,7 @@ import (
 
 	"github.com/KangBasrengg/MRI-Code/internal/analyzer"
 	"github.com/KangBasrengg/MRI-Code/internal/graph"
+	"github.com/KangBasrengg/MRI-Code/internal/remote"
 	"github.com/KangBasrengg/MRI-Code/internal/scanner"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -49,9 +50,9 @@ var scanCmd = &cobra.Command{
 			targetDir = args[0]
 		}
 
-		absPath, err := filepath.Abs(targetDir)
+		absPath, err := remote.ResolveTarget(targetDir)
 		if err != nil {
-			fmt.Printf("Error resolving path: %v\n", err)
+			fmt.Printf("Error resolving path or cloning repository: %v\n", err)
 			return
 		}
 

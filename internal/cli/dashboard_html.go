@@ -241,6 +241,23 @@ const dashboardHTML = `<!DOCTYPE html>
             </div>
         </header>
 
+        <!-- Online & Local Repository Switcher Bar -->
+        <div class="section-wide" style="padding: 1.25rem 2rem; border-color: rgba(6, 182, 212, 0.4); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; background: rgba(15, 23, 42, 0.6);">
+            <div style="flex: 1; min-width: 280px;">
+                <h3 style="font-size: 1.1rem; color: #38bdf8; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                    🌐 Instant Online & Local Repository Analyzer
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">Paste any GitHub URL (<code style="color:#a5f3fc; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">https://github.com/...</code>) or local directory path to shallow-clone, scan, and switch analytics instantly.</p>
+            </div>
+            <div style="display: flex; gap: 0.75rem; flex: 1.2; min-width: 300px;">
+                <input type="text" id="repo-target-input" placeholder="e.g. https://github.com/torvalds/linux or D:\Project Code\MRICode" style="flex: 1; background: rgba(8, 11, 18, 0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 0.75rem 1rem; color: #fff; font-size: 0.95rem; outline: none;">
+                <button id="scan-btn" onclick="switchRepository()" style="background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4); white-space: nowrap;">
+                    ⚡ Analyze & Clone
+                </button>
+            </div>
+            <div id="repo-scan-status" style="width: 100%; font-size: 0.9rem; color: #fbbf24; display: none;">⏳ Fetching repository and processing AST structures... Please wait a moment.</div>
+        </div>
+
         <div class="grid">
             <div class="panel" style="border-color: rgba(236, 72, 153, 0.3);">
                 <div>
@@ -382,6 +399,42 @@ const dashboardHTML = `<!DOCTYPE html>
             </p>
             <div id="performance-suggestions-area" style="margin-top: 1.5rem;">
                 <div class="suggestion-box">📦 Calculating import costs and bundling footprint...</div>
+            </div>
+        </div>
+
+        <!-- Phase 6 ("Cortex") & freemodel.dev Interactive AI Chatbot -->
+        <div class="section-wide" style="border-color: rgba(56, 189, 248, 0.4); background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 70%), var(--card-bg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 style="margin-bottom: 0.25rem;">🤖 Phase 06 ("Cortex") AI Copilot — Chat about Repository Functionality</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0;">Powered by local SQLite Neural Repository Graph (NRG) + freemodel.dev AI Intelligence Engine</p>
+                </div>
+                <span class="storage-pill" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); font-weight: bold;" id="cortex-engine-badge">Cortex v1.0.0 Ready</span>
+            </div>
+            
+            <div id="chat-history" style="height: 360px; overflow-y: auto; background: rgba(8, 11, 18, 0.95); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                <div class="chat-message ai" style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="background: #0284c7; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 1.2rem;">🤖</div>
+                    <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(56, 189, 248, 0.2); padding: 1rem 1.25rem; border-radius: 12px; border-top-left-radius: 2px; color: var(--text-main); line-height: 1.6; max-width: 85%;">
+                        <strong>👋 Welcome to CodeMRI Cortex!</strong>
+                        <p style="margin: 0.5rem 0 0 0;">I am connected to the active repository's SQLite Neural Repository Graph (NRG) and enriched with <code>freemodel.dev</code> artificial intelligence models. Ask me anything about this repository's architectural workflow, security intelligence, compilation bottlenecks, or specific function symbols!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                <span style="font-size: 0.8rem; color: #64748b; align-self: center;">Quick Prompts:</span>
+                <button onclick="sendQuickPrompt('What does this repository do? Give me an overview of its functionality.')" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 20px; padding: 0.35rem 0.85rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">💬 What does this repo do?</button>
+                <button onclick="sendQuickPrompt('Explain the security architecture and if there are any hardcoded secret risks.')" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 20px; padding: 0.35rem 0.85rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">🛡️ Explain security practices</button>
+                <button onclick="sendQuickPrompt('What are the top architectural hotspots and most connected functions in the graph?')" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 20px; padding: 0.35rem 0.85rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">⚙️ Top architectural hotspots</button>
+                <button onclick="sendQuickPrompt('How does the AST scanner engine process files and generate the graph?')" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 20px; padding: 0.35rem 0.85rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">📦 How does scanner work?</button>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+                <input type="text" id="chat-input-box" placeholder="Ask Cortex AI about functions, files, or technical concepts..." onkeydown="if(event.key==='Enter') sendChatMessage()" style="flex: 1; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 0.85rem 1.25rem; color: #fff; font-size: 1rem; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);">
+                <button onclick="sendChatMessage()" id="chat-send-btn" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: 1px solid #38bdf8; padding: 0.85rem 1.75rem; border-radius: 10px; font-weight: bold; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+                    <span>Ask Cortex</span> 🤖
+                </button>
             </div>
         </div>
 
@@ -769,6 +822,132 @@ const dashboardHTML = `<!DOCTYPE html>
                 '</div>';
             } catch (err) {
                 container.innerHTML = '<div style="color: #ef4444;">Error evaluating node impact.</div>';
+            }
+        }
+
+        // Online & Local Repository Analyzer Switcher
+        async function switchRepository() {
+            const target = document.getElementById('repo-target-input').value.trim();
+            if (!target) {
+                alert('Please enter a valid local directory or online GitHub repository URL.');
+                return;
+            }
+            const btn = document.getElementById('scan-btn');
+            const status = document.getElementById('repo-scan-status');
+            
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Analyzing...';
+            status.style.display = 'block';
+            status.innerText = '🌐 Shallow-cloning repository and analyzing AST structures... Please wait.';
+            status.style.color = '#fbbf24';
+
+            try {
+                const res = await fetch('/api/repo/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ target: target })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    status.style.color = '#34d399';
+                    status.innerText = '✔ Repository at ' + target + ' indexed successfully! Reloading diagnostics...';
+                    await initDashboard();
+                    setTimeout(() => { status.style.display = 'none'; }, 5000);
+                } else {
+                    status.style.color = '#ef4444';
+                    status.innerText = '❌ Error: ' + (data.error || 'Failed to scan target repository.');
+                }
+            } catch (err) {
+                status.style.color = '#ef4444';
+                status.innerText = '❌ Network connection failed while scanning repository.';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '⚡ Analyze & Clone';
+            }
+        }
+
+        // Cortex & freemodel.dev AI Chatbot Functions
+        function sendQuickPrompt(promptText) {
+            document.getElementById('chat-input-box').value = promptText;
+            sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input-box');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const history = document.getElementById('chat-history');
+            
+            const userDiv = document.createElement('div');
+            userDiv.style.display = 'flex';
+            userDiv.style.gap = '1rem';
+            userDiv.style.alignItems = 'flex-start';
+            userDiv.style.justifyContent = 'flex-end';
+            userDiv.innerHTML = '<div style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color: #fff; padding: 0.85rem 1.25rem; border-radius: 12px; border-top-right-radius: 2px; max-width: 80%; line-height: 1.5;">' + message + '</div>' +
+                                '<div style="background: #475569; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">👤</div>';
+            history.appendChild(userDiv);
+            input.value = '';
+            history.scrollTop = history.scrollHeight;
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'ai-loading-bubble';
+            loadingDiv.style.display = 'flex';
+            loadingDiv.style.gap = '1rem';
+            loadingDiv.style.alignItems = 'center';
+            loadingDiv.innerHTML = '<div style="background: #0284c7; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">🤖</div>' +
+                                   '<div style="color: #38bdf8; font-style: italic;">Cortex & freemodel.dev AI synthesizing structural answer...</div>';
+            history.appendChild(loadingDiv);
+            history.scrollTop = history.scrollHeight;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await res.json();
+                
+                const loader = document.getElementById('ai-loading-bubble');
+                if (loader) loader.remove();
+
+                const aiDiv = document.createElement('div');
+                aiDiv.style.display = 'flex';
+                aiDiv.style.gap = '1rem';
+                aiDiv.style.alignItems = 'flex-start';
+
+                let contentHtml = '';
+                if (res.ok && data.reply) {
+                    let formatted = data.reply
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/\u0060(.*?)\u0060/g, '<code style="background: rgba(255,255,255,0.1); color: #a5f3fc; padding: 0.15rem 0.4rem; border-radius: 4px;">$1</code>')
+                        .replace(/### (.*?)(\n|$)/g, '<h4 style="color: #38bdf8; font-size: 1.05rem; margin: 0.5rem 0;">$1</h4>')
+                        .replace(/#### (.*?)(\n|$)/g, '<h5 style="color: #fbbf24; font-size: 0.95rem; margin: 0.5rem 0;">$1</h5>')
+                        .replace(/\n/g, '<br>');
+                    
+                    contentHtml = '<div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(56, 189, 248, 0.25); padding: 1rem 1.25rem; border-radius: 12px; border-top-left-radius: 2px; color: #f8fafc; line-height: 1.6; max-width: 85%; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">' + 
+                                  formatted +
+                                  '<div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: #64748b; display: flex; justify-content: space-between;">' +
+                                    '<span>Engine: ' + (data.engine || 'Cortex AI') + '</span>' +
+                                    '<span style="color: #34d399;">✔ Verified over SQLite NRG</span>' +
+                                  '</div>' +
+                                  '</div>';
+                } else {
+                    contentHtml = '<div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 1rem; border-radius: 12px;">❌ Failed to receive reply: ' + (data.error || 'Server error') + '</div>';
+                }
+
+                aiDiv.innerHTML = '<div style="background: #0284c7; color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">🤖</div>' + contentHtml;
+                history.appendChild(aiDiv);
+                history.scrollTop = history.scrollHeight;
+            } catch (err) {
+                const loader = document.getElementById('ai-loading-bubble');
+                if (loader) loader.remove();
+
+                const errDiv = document.createElement('div');
+                errDiv.style.color = '#ef4444';
+                errDiv.innerText = '❌ Communication with Cortex AI server failed.';
+                history.appendChild(errDiv);
             }
         }
     </script>

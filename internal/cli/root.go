@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/KangBasrengg/MRI-Code/internal/remote"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -34,13 +35,16 @@ var rootCmd = &cobra.Command{
 		yellow := color.New(color.FgYellow, color.Bold).SprintFunc()
 
 		var err error
-		cwd := "."
+		targetInput := "."
 		if len(args) > 0 {
-			cwd = args[0]
+			targetInput = args[0]
 		}
-		cwd, err = filepath.Abs(cwd)
+		cwd, err := remote.ResolveTarget(targetInput)
 		if err != nil {
+			fmt.Printf("❌ Error resolving repository target: %v\n", err)
 			cwd, _ = os.Getwd()
+		} else if targetInput != "." {
+			_ = os.Chdir(cwd)
 		}
 
 		fmt.Println("=====================================================================")

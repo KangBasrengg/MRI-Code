@@ -9,6 +9,7 @@ import (
 	"github.com/KangBasrengg/MRI-Code/internal/analyzer"
 	"github.com/KangBasrengg/MRI-Code/internal/graph"
 	"github.com/KangBasrengg/MRI-Code/internal/performance"
+	"github.com/KangBasrengg/MRI-Code/internal/remote"
 	"github.com/KangBasrengg/MRI-Code/internal/security"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -24,9 +25,9 @@ var analyzeCmd = &cobra.Command{
 		if len(args) > 0 {
 			targetRoot = args[0]
 		}
-		absRoot, err := filepath.Abs(targetRoot)
+		absRoot, err := remote.ResolveTarget(targetRoot)
 		if err != nil {
-			return fmt.Errorf("invalid repository target: %w", err)
+			return fmt.Errorf("invalid repository target or failed remote clone: %w", err)
 		}
 
 		cyan := color.New(color.FgCyan, color.Bold).SprintFunc()

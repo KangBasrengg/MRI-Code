@@ -10,9 +10,12 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/KangBasrengg/MRI-Code/internal/cortex"
 	"github.com/KangBasrengg/MRI-Code/internal/graph"
+	"github.com/KangBasrengg/MRI-Code/internal/remote"
 	"github.com/fatih/color"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -36,17 +39,14 @@ var serveCmd = &cobra.Command{
 			fmt.Printf("%s Port %s is already in use. Automatically switched to port %s.\n", yellow("⚠ [PORT CONFLICT]"), yellow(port), green(activePort))
 		}
 
-		// 2. Locate the .codemri workspace
-		cwd, _ := os.Getwd()
-		dotDir := filepath.Join(cwd, ".codemri")
-		repoMetaPath := filepath.Join(dotDir, "repository.json")
-		graphPath := filepath.Join(dotDir, "graph.json")
-
-		dbPath := filepath.Join(dotDir, "graph.db")
-		pulsePath := filepath.Join(dotDir, "pulse.json")
-
-		secPath := filepath.Join(dotDir, "security.json")
-		perfPath := filepath.Join(dotDir, "performance.json")
+		// 2. Locate the .codemri workspace dynamically
+		getDotFile := func(filename string) (string, string) {
+			curr, err := os.Getwd()
+			if err != nil {
+				curr = "."
+			}
+			return curr, filepath.Join(curr, ".codemri", filename)
+		}
 
 		app := fiber.New(fiber.Config{
 			AppName:               "CodeMRI v1.0.0 (MRI)",
@@ -77,6 +77,7 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: Pulse Analytics Diagnostics ───
 		app.Get("/api/pulse", func(c *fiber.Ctx) error {
+			_, pulsePath := getDotFile("pulse.json")
 			data, err := os.ReadFile(pulsePath)
 			if err != nil {
 				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/pulse.json found. Run: codemri analyze ."})
@@ -87,6 +88,7 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: Shield Security Diagnostics ───
 		app.Get("/api/security", func(c *fiber.Ctx) error {
+			_, secPath := getDotFile("security.json")
 			data, err := os.ReadFile(secPath)
 			if err != nil {
 				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/security.json found. Run: codemri analyze ."})
@@ -97,6 +99,7 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: Velocity Performance Diagnostics ───
 		app.Get("/api/performance", func(c *fiber.Ctx) error {
+			_, perfPath := getDotFile("performance.json")
 			data, err := os.ReadFile(perfPath)
 			if err != nil {
 				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/performance.json found. Run: codemri analyze ."})
@@ -107,6 +110,7 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: Repository Metadata ───
 		app.Get("/api/repository", func(c *fiber.Ctx) error {
+			_, repoMetaPath := getDotFile("repository.json")
 			data, err := os.ReadFile(repoMetaPath)
 			if err != nil {
 				return c.Status(404).JSON(fiber.Map{"error": "No .codemri/repository.json found. Run: codemri scan ."})
@@ -117,6 +121,8 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: NRG Graph Data (Full Graph) ───
 		app.Get("/api/graph", func(c *fiber.Ctx) error {
+			cwd, dbPath := getDotFile("graph.db")
+			_, graphPath := getDotFile("graph.json")
 			// In Phase 3 Neuron, attempt to load cleanly from SQLite first
 			if sqliteStore, err := graph.NewSQLiteStorage(dbPath); err == nil {
 				defer sqliteStore.Close()
@@ -135,6 +141,8 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: NRG Graph Summary (Microsecond SQLite Aggregation) ───
 		app.Get("/api/graph/summary", func(c *fiber.Ctx) error {
+			_, dbPath := getDotFile("graph.db")
+			_, graphPath := getDotFile("graph.json")
 			if sqliteStore, err := graph.NewSQLiteStorage(dbPath); err == nil {
 				defer sqliteStore.Close()
 				if summary, err := sqliteStore.GetTopologySummary(); err == nil {
@@ -175,6 +183,7 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: Relational Graph Querying (Phase 3 Neuron Feature) ───
 		app.Get("/api/graph/node/:id", func(c *fiber.Ctx) error {
+			_, dbPath := getDotFile("graph.db")
 			sqliteStore, err := graph.NewSQLiteStorage(dbPath)
 			if err != nil {
 				return c.Status(500).JSON(fiber.Map{"error": "sqlite database unavailable"})
@@ -190,6 +199,7 @@ var serveCmd = &cobra.Command{
 		})
 
 		app.Get("/api/graph/neighbors/:id/:edge", func(c *fiber.Ctx) error {
+			_, dbPath := getDotFile("graph.db")
 			sqliteStore, err := graph.NewSQLiteStorage(dbPath)
 			if err != nil {
 				return c.Status(500).JSON(fiber.Map{"error": "sqlite database unavailable"})
@@ -207,6 +217,8 @@ var serveCmd = &cobra.Command{
 
 		// ─── API: Phase 05 ("Vision") Instant Impact Analysis & Subgraph Topology ───
 		app.Get("/api/graph/impact/:id", func(c *fiber.Ctx) error {
+			cwd, dbPath := getDotFile("graph.db")
+			_, graphPath := getDotFile("graph.json")
 			var nrg *graph.NeuralRepositoryGraph
 			if sqliteStore, err := graph.NewSQLiteStorage(dbPath); err == nil {
 				nrg, _ = sqliteStore.LoadGraph(cwd)
@@ -260,6 +272,52 @@ var serveCmd = &cobra.Command{
 				"impact_score":            impactScore,
 				"severity":                severity,
 				"advice":                  fmt.Sprintf("Modifying %s risks cascading changes across %d dependent symbol layers.", targetNode.Name, len(upstreamDependents)),
+			})
+		})
+
+		// ─── API: Cortex & Freemodel.dev AI Interactive Chatbot ───
+		app.Post("/api/chat", func(c *fiber.Ctx) error {
+			var req struct {
+				Message string `json:"message"`
+			}
+			if err := c.BodyParser(&req); err != nil || strings.TrimSpace(req.Message) == "" {
+				return c.Status(400).JSON(fiber.Map{"error": "Message content required"})
+			}
+			currDir, _ := os.Getwd()
+			resp, err := cortex.GenerateChatReply(currDir, req.Message)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+			}
+			return c.JSON(resp)
+		})
+
+		// ─── API: Online/Offline Dynamic Repository Analyzer Switcher ───
+		app.Post("/api/repo/scan", func(c *fiber.Ctx) error {
+			var req struct {
+				Target string `json:"target"`
+			}
+			if err := c.BodyParser(&req); err != nil || strings.TrimSpace(req.Target) == "" {
+				return c.Status(400).JSON(fiber.Map{"error": "Target directory or GitHub URL required"})
+			}
+
+			fmt.Printf("\n🌐 [WEB ANALYZER] Received request to dynamically analyze: %s\n", req.Target)
+			newPath, err := remote.ResolveTarget(req.Target)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("Failed to clone or open repository: %v", err)})
+			}
+
+			_ = os.Chdir(newPath)
+			if scanCmd.Run != nil {
+				scanCmd.Run(cmd, []string{newPath})
+			}
+			if analyzeCmd.RunE != nil {
+				_ = analyzeCmd.RunE(cmd, []string{newPath})
+			}
+
+			return c.JSON(fiber.Map{
+				"status": "success",
+				"path":   newPath,
+				"msg":    fmt.Sprintf("Repository successfully scanned and indexed! (Active target: %s)", req.Target),
 			})
 		})
 
