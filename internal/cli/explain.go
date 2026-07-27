@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/KangBasrengg/MRI-Code/internal/cortex"
 	"github.com/KangBasrengg/MRI-Code/internal/graph"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -59,22 +60,42 @@ Examples:
 
 		fmt.Printf("📊 NRG Loaded: %s nodes, %s edges\n\n", green(fmt.Sprintf("%d", len(nrg.Nodes))), green(fmt.Sprintf("%d", len(nrg.Edges))))
 
-		// Extract search keywords from the question
-		keywords := extractKeywords(question)
+		// Extract search keywords from the question using cortex NLP syntax rules
+		keywords := cortex.ExtractKeywords(question)
 		fmt.Printf("🔍 Search Keywords: %s\n\n", yellow(strings.Join(keywords, ", ")))
+
+		// Invoke Cortex conversational AI engine (Freemodel.dev Online or Local Offline Structural)
+		chatResp, chatErr := cortex.GenerateChatReply(cwd, question)
+		if chatErr == nil && chatResp != nil && len(chatResp.Reply) > 0 {
+			fmt.Println(cyan("💡 CORTEX CONVERSATIONAL INTELLIGENCE (" + chatResp.Engine + ")"))
+			fmt.Println("═══════════════════════════════════════════════════")
+			fmt.Println(white(chatResp.Reply))
+			fmt.Println("═══════════════════════════════════════════════════\n")
+		}
 
 		// Search NRG for relevant nodes
 		relevantNodes := searchNRG(nrg, keywords)
 
 		if len(relevantNodes) == 0 {
-			fmt.Println(yellow("⚠ No directly matching nodes found in the NRG for your query."))
-			fmt.Println("  Try more specific terms, or run 'codemri graph' to see available symbols.")
+			if chatResp == nil || len(chatResp.Reply) == 0 {
+				fmt.Println(yellow("⚠ No directly matching nodes found in the NRG for your query."))
+				fmt.Println("  Try more specific terms, or run 'codemri graph' to see available symbols.")
+				return nil
+			}
+			// General architectural query answered conversationally
+			fmt.Println("═══════════════════════════════════════════════════")
+			if cortex.OfflineMode || os.Getenv("CODEMRI_OFFLINE") == "1" || os.Getenv("CODEMRI_OFFLINE") == "true" {
+				fmt.Printf("💡 %s: This analysis is generated entirely offline using your local NRG database.\n", cyan("Cortex"))
+				fmt.Println("   No source code was transmitted to any external server (ADR-0002).")
+			} else {
+				fmt.Printf("💡 %s: Hybrid intelligence powered by freemodel.dev cloud models + local SQLite NRG.\n", cyan("Cortex"))
+			}
 			return nil
 		}
 
 		// Generate structural explanation
-		fmt.Println(cyan("💡 CORTEX ANALYSIS RESULT"))
-		fmt.Println("═══════════════════════════════════════════════════")
+		fmt.Println(cyan("🔍 CORTEX STRUCTURAL SYMBOL TOPOLOGY"))
+		fmt.Println("───────────────────────────────────────────────────")
 
 		// Group by type
 		typeGroups := make(map[string][]*graph.Node)
@@ -123,35 +144,15 @@ Examples:
 		}
 
 		fmt.Println("\n═══════════════════════════════════════════════════")
-		fmt.Printf("💡 %s: This analysis is generated entirely offline using your local NRG database.\n", cyan("Cortex"))
-		fmt.Println("   No source code was transmitted to any external server (ADR-0002).")
+		if cortex.OfflineMode || os.Getenv("CODEMRI_OFFLINE") == "1" || os.Getenv("CODEMRI_OFFLINE") == "true" {
+			fmt.Printf("💡 %s: This analysis is generated entirely offline using your local NRG database.\n", cyan("Cortex"))
+			fmt.Println("   No source code was transmitted to any external server (ADR-0002).")
+		} else {
+			fmt.Printf("💡 %s: Hybrid intelligence powered by freemodel.dev cloud models + local SQLite NRG.\n", cyan("Cortex"))
+		}
 
 		return nil
 	},
-}
-
-// extractKeywords pulls meaningful search terms from natural language questions.
-func extractKeywords(question string) []string {
-	// Remove common stop words
-	stopWords := map[string]bool{
-		"how": true, "does": true, "the": true, "what": true, "are": true,
-		"is": true, "in": true, "a": true, "an": true, "of": true,
-		"to": true, "and": true, "or": true, "for": true, "with": true,
-		"my": true, "me": true, "show": true, "which": true, "where": true,
-		"can": true, "you": true, "this": true, "that": true, "work": true,
-		"works": true, "main": true, "most": true, "have": true, "has": true,
-	}
-
-	words := strings.Fields(strings.ToLower(question))
-	keywords := make([]string, 0)
-	for _, w := range words {
-		// Clean punctuation
-		w = strings.Trim(w, "?.,!\"'")
-		if len(w) > 2 && !stopWords[w] {
-			keywords = append(keywords, w)
-		}
-	}
-	return keywords
 }
 
 // searchNRG finds nodes matching any of the given keywords.

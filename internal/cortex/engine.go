@@ -110,6 +110,24 @@ func GenerateChatReply(repoPath string, question string) (*ChatResponse, error) 
 	keywords := ExtractKeywords(question)
 	relevantNodes := SearchNRG(nrg, keywords)
 
+	// If no direct keyword matches (e.g. general questions like "apa fungsi repo ini?"), fallback to top structural hub nodes
+	if len(relevantNodes) == 0 && len(nrg.Nodes) > 0 {
+		topNodes := make([]*graph.Node, 0, len(nrg.Nodes))
+		for _, n := range nrg.Nodes {
+			topNodes = append(topNodes, n)
+		}
+		sort.Slice(topNodes, func(i, j int) bool {
+			in1, out1 := CountConnections(nrg, topNodes[i].ID)
+			in2, out2 := CountConnections(nrg, topNodes[j].ID)
+			return (in1 + out1) > (in2 + out2)
+		})
+		if len(topNodes) > 12 {
+			relevantNodes = topNodes[:12]
+		} else {
+			relevantNodes = topNodes
+		}
+	}
+
 	symbols := make([]SymbolSummary, 0)
 	var symbolContext strings.Builder
 	limit := 12
@@ -136,8 +154,21 @@ func GenerateChatReply(repoPath string, question string) (*ChatResponse, error) 
 		}
 	}
 
+	// Read README snippet if available for general context enrichment
+	var readmeSnippet string
+	for _, fname := range []string{"README.md", "readme.md", "README.txt", "readme.txt"} {
+		if content, err := os.ReadFile(filepath.Join(absPath, fname)); err == nil {
+			snippet := string(content)
+			if len(snippet) > 800 {
+				snippet = snippet[:800] + "..."
+			}
+			readmeSnippet = snippet
+			break
+		}
+	}
+
 	// Construct comprehensive AI system prompt & context
-	systemPrompt := "You are CodeMRI Cortex, an elite AI software architecture consultant and codebase intelligence assistant created by Muhammad Nuril (@KangBasrengg). You analyze repositories using Neural Repository Graph (NRG) analytical data. Answer the user's questions clearly, accurately, and concisely in GitHub-style Markdown. Highlight key architecture patterns, security practices, and symbol relationships when relevant."
+	systemPrompt := "You are CodeMRI Cortex, an elite AI software architecture consultant and codebase intelligence assistant created by Muhammad Nuril (@KangBasrengg). You analyze repositories using Neural Repository Graph (NRG) analytical data and documentation summaries. Answer the user's questions clearly, accurately, and concisely in GitHub-style Markdown. Highlight key architecture patterns, security practices, and symbol relationships when relevant."
 
 	var promptContext strings.Builder
 	promptContext.WriteString(fmt.Sprintf("Repository Architecture Profile:\n"))
@@ -148,10 +179,11 @@ func GenerateChatReply(repoPath string, question string) (*ChatResponse, error) 
 	if secGrade != "" {
 		promptContext.WriteString(fmt.Sprintf("- Shield Security Grade: %s\n", secGrade))
 	}
+	if readmeSnippet != "" {
+		promptContext.WriteString(fmt.Sprintf("\nRepository README Snapshot:\n```\n%s\n```\n", readmeSnippet))
+	}
 	if symbolContext.Len() > 0 {
-		promptContext.WriteString(fmt.Sprintf("\nTop Relevant Structural Code Symbols Discovered for Query:\n%s", symbolContext.String()))
-	} else {
-		promptContext.WriteString("\nNo specific symbols matched exact keyword filters; provide high-level architectural insight or ask to specify symbol names.\n")
+		promptContext.WriteString(fmt.Sprintf("\nCore Architectural Symbols & Dependencies Discovered:\n%s", symbolContext.String()))
 	}
 
 	userPrompt := fmt.Sprintf("Repository Context:\n%s\n\nUser Question:\n%s", promptContext.String(), question)
@@ -176,7 +208,7 @@ func GenerateChatReply(repoPath string, question string) (*ChatResponse, error) 
 
 	// Graceful Fallback: Local Structural Synthesis (Offline-First)
 	qLower := strings.ToLower(question)
-	isGeneral := strings.Contains(qLower, "what is this") || strings.Contains(qLower, "overview") || strings.Contains(qLower, "summary") || len(keywords) == 0
+	isGeneral := strings.Contains(qLower, "what is this") || strings.Contains(qLower, "overview") || strings.Contains(qLower, "summary") || strings.Contains(qLower, "apa fungsi") || strings.Contains(qLower, "fungsi dari") || strings.Contains(qLower, "repository ini") || strings.Contains(qLower, "tentang apa") || strings.Contains(qLower, "jelaskan") || len(keywords) == 0
 
 	var fallbackReply strings.Builder
 	if isGeneral {
@@ -223,85 +255,98 @@ func GenerateChatReply(repoPath string, question string) (*ChatResponse, error) 
 	}, nil
 }
 
-// CallFreemodelAI executes a chat completion HTTP request against Freemodel.dev API endpoints.
+// CallFreemodelAI executes a chat completion HTTP request against Freemodel.dev API endpoints,
+// automatically trying high-performance model aliases (gpt-5.6-luna, sol, terra) with intelligent failover.
 func CallFreemodelAI(apiKey, systemPrompt, userPrompt string) (string, error) {
 	url := os.Getenv("CODEMRI_AI_URL")
 	if url == "" {
 		url = "https://api.freemodel.dev/v1/chat/completions"
 	}
-	model := os.Getenv("CODEMRI_AI_MODEL")
-	if model == "" {
-		model = "gpt-4o-mini" // Supported general model alias on free endpoints
+
+	modelEnv := os.Getenv("CODEMRI_AI_MODEL")
+	modelsToTry := []string{"gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra"}
+	if modelEnv != "" {
+		modelsToTry = append([]string{modelEnv}, modelsToTry...)
 	}
 
-	payload := map[string]interface{}{
-		"model": model,
-		"messages": []map[string]string{
-			{"role": "system", "content": systemPrompt},
-			{"role": "user", "content": userPrompt},
-		},
-		"temperature": 0.3,
-		"max_tokens":  1200,
-	}
-
-	jsonBytes, err := json.Marshal(payload)
-	if err != nil {
-		return "", err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 16*time.Second)
 	defer cancel()
+	client := &http.Client{Timeout: 16 * time.Second}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonBytes))
-	if err != nil {
-		return "", err
-	}
+	var lastErr error
+	for _, model := range modelsToTry {
+		payload := map[string]interface{}{
+			"model": model,
+			"messages": []map[string]string{
+				{"role": "system", "content": systemPrompt},
+				{"role": "user", "content": userPrompt},
+			},
+			"temperature": 0.3,
+			"max_tokens":  1200,
+		}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-
-	client := &http.Client{Timeout: 12 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		// Fallback trial for api.freemodels.dev plural variation if DNS fails
-		if strings.Contains(url, "freemodel.dev") && !strings.Contains(url, "freemodels.dev") {
-			altURL := "https://api.freemodels.dev/v1/chat/completions"
-			reqAlt, _ := http.NewRequestWithContext(ctx, "POST", altURL, bytes.NewBuffer(jsonBytes))
-			reqAlt.Header.Set("Content-Type", "application/json")
-			reqAlt.Header.Set("Authorization", "Bearer "+apiKey)
-			if altResp, altErr := client.Do(reqAlt); altErr == nil {
-				resp = altResp
-				err = nil
-			} else {
-				return "", altErr
-			}
-		} else {
+		jsonBytes, err := json.Marshal(payload)
+		if err != nil {
 			return "", err
 		}
-	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("AI API returned status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
+		req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonBytes))
+		if err != nil {
+			return "", err
+		}
 
-	var result struct {
-		Choices []struct {
-			Message struct {
-				Content string `json:"content"`
-			} `json:"message"`
-		} `json:"choices"`
-	}
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+apiKey)
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", err
-	}
+		resp, err := client.Do(req)
+		if err != nil {
+			// Fallback trial for api.freemodels.dev plural variation if DNS fails
+			if strings.Contains(url, "freemodel.dev") && !strings.Contains(url, "freemodels.dev") {
+				altURL := "https://api.freemodels.dev/v1/chat/completions"
+				reqAlt, _ := http.NewRequestWithContext(ctx, "POST", altURL, bytes.NewBuffer(jsonBytes))
+				reqAlt.Header.Set("Content-Type", "application/json")
+				reqAlt.Header.Set("Authorization", "Bearer "+apiKey)
+				if altResp, altErr := client.Do(reqAlt); altErr == nil {
+					resp = altResp
+					err = nil
+				} else {
+					lastErr = altErr
+					continue
+				}
+			} else {
+				lastErr = err
+				continue
+			}
+		}
 
-	if len(result.Choices) > 0 {
-		return strings.TrimSpace(result.Choices[0].Message.Content), nil
+		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+			bodyBytes, _ := io.ReadAll(resp.Body)
+			resp.Body.Close()
+			lastErr = fmt.Errorf("AI API returned status %d for model %s: %s", resp.StatusCode, model, string(bodyBytes))
+			continue
+		}
+
+		var result struct {
+			Choices []struct {
+				Message struct {
+					Content string `json:"content"`
+				} `json:"message"`
+			} `json:"choices"`
+		}
+
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			resp.Body.Close()
+			lastErr = err
+			continue
+		}
+		resp.Body.Close()
+
+		if len(result.Choices) > 0 && len(strings.TrimSpace(result.Choices[0].Message.Content)) > 0 {
+			return strings.TrimSpace(result.Choices[0].Message.Content), nil
+		}
+		lastErr = fmt.Errorf("empty AI choices returned for model %s", model)
 	}
-	return "", fmt.Errorf("empty AI choices returned")
+	return "", fmt.Errorf("all cloud AI model attempts failed: %v", lastErr)
 }
 
 // ExtractKeywords removes common English words and punctuation to isolate code technical concepts.
@@ -315,6 +360,12 @@ func ExtractKeywords(question string) []string {
 		"works": true, "main": true, "most": true, "have": true, "has": true,
 		"about": true, "please": true, "tell": true, "find": true, "function": true,
 		"repo": true, "repository": true, "code": true, "project": true, "file": true,
+		// Indonesian Stop Words & Query Terms
+		"apa": true, "fungsi": true, "dari": true, "ini": true, "adalah": true,
+		"bagaimana": true, "kenapa": true, "dimana": true, "siapa": true, "untuk": true,
+		"di": true, "ke": true, "pada": true, "dan": true, "atau": true,
+		"yang": true, "dengan": true, "sebutkan": true, "jelaskan": true, "buat": true,
+		"buatkan": true, "tentang": true, "bagaimanakah": true, "mengenai": true,
 	}
 
 	words := strings.Fields(strings.ToLower(question))
